@@ -3,3 +3,4 @@ __pychache__/
 config.py
 *.pyc
 *.db
+*.txt
