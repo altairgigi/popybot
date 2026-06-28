@@ -1,35 +1,31 @@
 import telebot
 import random
-from difflib import SequenceMatcher
 import greet
 import memo
 import config
 
 bot = telebot.TeleBot(config.TOKEN)
 
-INTENTS = {
-    "greeting": ["ciao", "buongiorno", "buon pomeriggio", "buona sera", "buonanotte", "arrivederci"],
-    "memo": ["ricordami di", "crea un promemoria", "scrivi una nota", "imposta promemoria per", "mi ricordi di"],
-    "weather": ["che tempo fa", "oggi piove", "che temperatura c'è", "quali sono le previsioni", "dimmi il meteo"]
-}
-
-def calculate_similarity(a, b):
-    return SequenceMatcher(None, a.lower(), b.lower()).ratio() * 100
-
 def decode_intent(user_message):
-    best_guess = "unknown"
-    best_score = 0
-    threshold = 65
+    user_text = user_message.lower()
 
-    for intent, examples_list in INTENTS.items():
-        for example in examples_list:
-            score = calculate_similarity(user_message, example)
+    memo_words = ["ricorda", "ricordami", "annot", "scrivi", "promemoria", "nota"]
+    weather_words = ["meteo", "tempo", "pioggia", "pioverà", "gradi", "temperatura", "ombrello", "sole"]
+    greet_words = ["ciao", "buongiorno", "buonasera", "buon pomeriggio", "salve"]
 
-            if score > threshold and score > best_score:
-                best_score = score
-                best_guess = intent
+    for word in memo_words:
+        if word in user_text:
+            return "memo"
 
-    return best_guess
+    for word in weather_words:
+        if word in user_text:
+            return "weather"
+
+    for word in greet_words:
+        if word in user_text:
+            return"greeting"
+        
+    return "unknown"
 
 @bot.message_handler(commands = ["start"])
 def welcome(message):
