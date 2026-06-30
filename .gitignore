@@ -1,8 +1,8 @@
 .vscode/
 .venv/
 venv/
-__pychache__/
-config.py
+__pycache__/
+.env
 *.pyc
 *.db
 *.txt

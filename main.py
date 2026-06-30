@@ -1,15 +1,21 @@
-import telebot
+import os
 import random
+import telebot
+from dotenv import load_dotenv
 import greet
 import memo
-import config
 
-bot = telebot.TeleBot(config.TOKEN)
+load_dotenv()
+
+TOKEN = os.environ.get("TELEGRAM_TOKEN")
+
+bot = telebot.TeleBot(TOKEN)
+memo.start_check_memo(bot)
 
 def decode_intent(user_message):
     user_text = user_message.lower()
 
-    memo_words = ["ricorda", "ricordami", "annot", "scrivi", "promemoria", "nota"]
+    memo_words = ["ricord", "ricordami", "annot", "scrivi", "promemoria", "nota"]
     weather_words = ["meteo", "tempo", "pioggia", "pioverà", "gradi", "temperatura", "ombrello", "sole"]
     greet_words = ["ciao", "buongiorno", "buonasera", "buon pomeriggio", "salve"]
 
@@ -49,7 +55,7 @@ def message_handler(message):
         bot.reply_to(message, greet.greet_user())
 
     elif user_intent == "memo":
-        bot.reply_to(message, memo.write_memo(user_message))
+        bot.reply_to(message, memo.write_memo(user_message, message.chat.id))
 
     elif user_intent == "weather":
         bot.reply_to(message, "Aspetta che guardo fuori e ti dico...")
