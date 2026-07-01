@@ -4,6 +4,7 @@ import telebot
 from dotenv import load_dotenv
 import greet
 import memo
+import weather
 
 load_dotenv()
 
@@ -13,22 +14,21 @@ bot = telebot.TeleBot(TOKEN)
 memo.start_check_memo(bot)
 
 def decode_intent(user_message):
-    user_text = user_message.lower()
 
     memo_words = ["ricord", "ricordami", "annot", "scrivi", "promemoria", "nota"]
-    weather_words = ["meteo", "tempo", "pioggia", "pioverà", "gradi", "temperatura", "ombrello", "sole"]
+    weather_words = ["meteo", "tempo", "pioggia", "piove", "gradi", "temperatura", "ombrello", "sole"]
     greet_words = ["ciao", "buongiorno", "buonasera", "buon pomeriggio", "salve"]
 
     for word in memo_words:
-        if word in user_text:
+        if word in user_message:
             return "memo"
 
     for word in weather_words:
-        if word in user_text:
+        if word in user_message:
             return "weather"
 
     for word in greet_words:
-        if word in user_text:
+        if word in user_message:
             return"greeting"
         
     return "unknown"
@@ -39,7 +39,7 @@ def welcome(message):
 
 @bot.message_handler(commands = ["help"])
 def help(message):
-    bot.send_message(message.chat.id, "Per adesso non so fare molto. Posso salutare, dirti il meteo o ricordarti le cose... più o meno")
+    bot.send_message(message.chat.id, "Per adesso non so fare molto. Posso salutare, dirti il meteo o ricordarti le cose.")
 
 @bot.message_handler(commands = ["memolist"])
 def memo_list(message):
@@ -47,18 +47,18 @@ def memo_list(message):
 
 @bot.message_handler(func=lambda message: True)
 def message_handler(message):
-    user_message = message.text
+    user_message = message.text.lower()
 
     user_intent = decode_intent(user_message)
 
     if user_intent == "greeting":
-        bot.reply_to(message, greet.greet_user())
+        bot.send_message(message.chat.id, greet.greet_user())
 
     elif user_intent == "memo":
-        bot.reply_to(message, memo.write_memo(user_message, message.chat.id))
+        bot.send_message(message.chat.id, memo.write_memo(user_message, message.chat.id))
 
     elif user_intent == "weather":
-        bot.reply_to(message, "Aspetta che guardo fuori e ti dico...")
+        bot.send_message(message.chat.id, weather.get_weather(user_message), parse_mode="HTML")
 
     else:
         replies_list = [

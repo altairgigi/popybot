@@ -61,9 +61,9 @@ def extract_time_and_date(user_text):
 
 def write_memo(user_message, chat_id):
     PREFIX_LIST = ["ricordami di ", "crea un promemoria ", "crea una nota ", "scrivi un promemoria ", "scrivi una nota ", "mi ricordi di "]
-    user_text = user_message.lower()
+
     for prefix in PREFIX_LIST:
-        if user_text.startswith(prefix):
+        if user_message.startswith(prefix):
             user_text = user_message[len(prefix):]
             break
 
