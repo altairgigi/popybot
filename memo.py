@@ -1,10 +1,8 @@
-import os
 import re
 import time
 import threading
 from datetime import datetime, timedelta
-
-FILE = "memo.txt"
+import database
 
 def extract_time_and_date(user_text):
     time_pattern = r"alle\s(\d{1,2})(?::(\d{2}))?"
@@ -51,13 +49,15 @@ def extract_time_and_date(user_text):
             difference_days += 7
 
         memo_date = today + timedelta(days=difference_days)
-    
-    memo_date = memo_date.strftime("%d/%m/%Y")
 
     memo_title = re.sub(time_pattern, "", user_text).strip()
     memo_title = re.sub(date_pattern, "", memo_title).strip()
 
-    return f"{memo_title} - {memo_hour}:{memo_minutes} {memo_date}"
+    memo_time = f"{memo_hour}:{memo_minutes}"
+
+    memo_date = memo_date.strftime("%d/%m/%Y")
+
+    return memo_title, memo_time, memo_date
 
 def write_memo(user_message, chat_id):
     PREFIX_LIST = ["ricordami di ", "crea un promemoria ", "crea una nota ", "scrivi un promemoria ", "scrivi una nota ", "mi ricordi di "]
@@ -70,60 +70,44 @@ def write_memo(user_message, chat_id):
     if not user_text.strip():
         return "Non mi ha detto cosa devo ricordarti."
     
-    user_memo = extract_time_and_date(user_text)
+    title, time, date = extract_time_and_date(user_text)
     
-    with open(FILE, "a", encoding="utf-8") as file:
-        file.write(f"* {chat_id} - {user_memo}\n")
+    database.add_memo(chat_id, title, time, date)
 
-    return f"Fatto! Ho annotato '{user_memo}'." 
+    return f"Fatto! Ho annotato '{title}' alle {time} il {date}." 
 
-def check_memo(bot):
+def memo_alert(bot):
     while True:
-        try:
-            now = datetime.now()
-            current_time = now.strftime("%H:%M")
-            current_date = now.strftime("%d/%m/%Y")
-
-            unexpired_memos = []
-            expired_memos = []
+        now = datetime.now()
+        current_time = now.strftime("%H:%M")
+        current_date = now.strftime("%d/%m/%Y")
+    
+        expired_memos = database.check_memo(current_time, current_date)
         
-            try:
-                with open(FILE, "r", encoding="utf-8") as file:
-                    lines = file.readlines()
-            except FileNotFoundError:
-                lines = []
-            
-            for line in lines:
-                if current_time in line and current_date in line:
-                    chat_id = line.replace("*", "").split("-")[0].strip()
-                    memo_title = line.split("-")[1].strip()
-                    expired_memos.append(memo_title)
-                else:
-                    unexpired_memos.append(line)
-            
-            if expired_memos:
-                for memo in expired_memos:
-                    bot.send_message(chat_id, f"<b>PROMEMORIA!</b>\n\nNon scordarti di <b><i>{memo}</i></b>!", parse_mode="HTML")
-
-                with open(FILE, "w", encoding="utf-8") as file:
-                    file.writelines(unexpired_memos)
-        
-        except Exception as e:
-            print(f"Error in memo check loop: {e}")
+        if expired_memos:
+            for memo in expired_memos:
+                bot.send_message(memo[1], f"<b>PROMEMORIA!</b>\n\nNon scordarti di <b><i>{memo[2]}</i></b>!", parse_mode="HTML")
 
         time.sleep(60)
 
-def start_check_memo(bot):
-    memo_checking_thread = threading.Thread(target=check_memo, args=(bot,), daemon=True)
+def start_memo_alert(bot):
+    memo_checking_thread = threading.Thread(target=memo_alert, args=(bot,), daemon=True)
     memo_checking_thread.start()
 
-def read_memo():
-    if not os.path.exists(FILE) or os.path.getsize(FILE) == 0:
-        return "Non hai ancora nessun promemoria"
+def read_memos(chat_id):
+    memos = database.get_memo_list(chat_id)
 
-    with open(FILE, "r", encoding="utf-8") as file:
-        memo_list = file.readlines()
+    memo_reply = "La lista dei promemoria è vuota!"
 
-    memo_reply = "Ecco i tuoi promemoria:\n"
+    if memos:
+        memo_reply = "Ecco i tuoi promemoria:\n"
+        
+        for memo in memos:
+            memo_reply += f"* {memo[0]} - {memo[1]} {memo[2]}\n"
 
-    return memo_reply + "".join(memo_list)
+    return memo_reply
+
+def clean_memos(chat_id):
+    database.clean_memo_list(chat_id)
+
+    return "La lista dei promemoria è stata svuotata!"

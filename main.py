@@ -2,6 +2,7 @@ import os
 import random
 import telebot
 from dotenv import load_dotenv
+import database
 import greet
 import memo
 import weather
@@ -11,13 +12,15 @@ load_dotenv()
 TOKEN = os.environ.get("TELEGRAM_TOKEN")
 
 bot = telebot.TeleBot(TOKEN)
-memo.start_check_memo(bot)
+
+database.initialise()
+memo.start_memo_alert(bot)
 
 def decode_intent(user_message):
 
-    memo_words = ["ricord", "ricordami", "annot", "scrivi", "promemoria", "nota"]
+    memo_words = ["ricord", "ricordami", "annot", "scrivi", "promemoria", "nota", "segna"]
     weather_words = ["meteo", "tempo", "pioggia", "piove", "gradi", "temperatura", "ombrello", "sole"]
-    greet_words = ["ciao", "buongiorno", "buonasera", "buon pomeriggio", "salve"]
+    greet_words = ["ciao", "buongiorno", "buonasera", "buon pomeriggio", "salve", "buondì"]
 
     for word in memo_words:
         if word in user_message:
@@ -41,9 +44,13 @@ def welcome(message):
 def help(message):
     bot.send_message(message.chat.id, "Per adesso non so fare molto. Posso salutare, dirti il meteo o ricordarti le cose.")
 
-@bot.message_handler(commands = ["memolist"])
+@bot.message_handler(commands = ["memo"])
 def memo_list(message):
-    bot.send_message(message.chat.id, memo.read_memo())
+    bot.send_message(message.chat.id, memo.read_memos(message.chat.id))
+
+@bot.message_handler(commands = ["clean"])
+def memo_list(message):
+    bot.send_message(message.chat.id, memo.clean_memos(message.chat.id))
 
 @bot.message_handler(func=lambda message: True)
 def message_handler(message):
