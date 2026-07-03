@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import database
 import greet
 import memo
+import voice
 import weather
 
 load_dotenv()
@@ -36,6 +37,28 @@ def decode_intent(user_message):
         
     return "unknown"
 
+def process_intent(message, user_text):
+    user_intent = decode_intent(user_text)
+
+    if user_intent == "greeting":
+        bot.send_message(message.chat.id, greet.greet_user())
+
+    elif user_intent == "memo":
+        bot.send_message(message.chat.id, memo.write_memo(user_text, message.chat.id))
+
+    elif user_intent == "weather":
+        bot.send_message(message.chat.id, weather.get_weather(user_text), parse_mode="HTML")
+
+    else:
+        replies_list = [
+            "6 7",
+            "C'hai detto?",
+            "'Nche senso, scusa?"
+        ]
+
+        random_choice = random.choice(replies_list)
+        bot.reply_to(message, random_choice)
+
 @bot.message_handler(commands = ["start"])
 def welcome(message):
     bot.send_message(message.chat.id, "PRONTI!")
@@ -52,30 +75,30 @@ def memo_list(message):
 def memo_list(message):
     bot.send_message(message.chat.id, memo.clean_memos(message.chat.id))
 
+@bot.message_handler(content_types=['voice'])
+def voice_handler(message):
+    file_info = bot.get_file(message.voice.file_id)
+    raw_audio = bot.download_file(file_info.file_path)
+
+    with open("audio/voice.ogg", "wb") as file:
+        file.write(raw_audio)
+
+    transcribed_text = voice.transcribe_audio("audio/voice.ogg")
+
+    message.text = transcribed_text
+    
+    if os.path.exists("audio/voice.ogg"):
+        os.remove("audio/voice.ogg")
+
+    user_text = message.text.lower()
+
+    process_intent(message, user_text)
+
 @bot.message_handler(func=lambda message: True)
 def message_handler(message):
-    user_message = message.text.lower()
+    user_text = message.text.lower()
 
-    user_intent = decode_intent(user_message)
-
-    if user_intent == "greeting":
-        bot.send_message(message.chat.id, greet.greet_user())
-
-    elif user_intent == "memo":
-        bot.send_message(message.chat.id, memo.write_memo(user_message, message.chat.id))
-
-    elif user_intent == "weather":
-        bot.send_message(message.chat.id, weather.get_weather(user_message), parse_mode="HTML")
-
-    else:
-        replies_list = [
-            "6 7",
-            "C'hai detto?",
-            "'Nche senso, scusa?"
-        ]
-
-        random_choice = random.choice(replies_list)
-        bot.reply_to(message, random_choice)
+    process_intent(message, user_text)
 
 print("Bot listening...")
 bot.infinity_polling()

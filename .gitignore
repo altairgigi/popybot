@@ -9,3 +9,5 @@ venv/
 *.pyc
 *.db
 *.txt
+*.ogg
+*.wav
