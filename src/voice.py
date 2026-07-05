@@ -1,6 +1,6 @@
-import os
 import speech_recognition
 from pydub import AudioSegment
+import config
 
 def transcribe_audio(ogg_file_path):
     wav_file_path = ogg_file_path.replace(".ogg", ".wav")
@@ -13,18 +13,16 @@ def transcribe_audio(ogg_file_path):
     with speech_recognition.AudioFile(wav_file_path) as source:
         audio_data = recon.record(source)
 
-    if os.path.exists(wav_file_path):
-        os.remove(wav_file_path)
-
     try:
-        text = recon.recognize_google(audio_data, language="it_IT")
+        text = recon.recognize_google(audio_data, language=config.LANGUAGE)
         return text
     
     except speech_recognition.UnknownValueError:
-        return "Non ho capito cosa hai detto, puoi ripetere?"
+        raise speech_recognition.UnknownValueError
     
     except speech_recognition.RequestError:
-        return "In questo momento ho problemi a connettermi al servizio trascrizione vocale."
+        raise speech_recognition.RequestError
     
     except Exception as e:
-        return f"C'è stato un errore inaspettato: {e}"
+        print(f"Unexpected error: {e}")
+        return

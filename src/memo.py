@@ -2,18 +2,19 @@ import re
 import time
 import threading
 from datetime import datetime, timedelta
-import database
+from src import database
+import config
 
 def extract_time_and_date(user_text):
-    time_pattern = r"alle\s(\d{1,2})(?::(\d{2}))?"
-    date_pattern = r"\b(luned[ìi]|marted[ìi]|mercoled[ìi]|gioved[ìi]|venerd[ìi]|sabato|domenica|domani|oggi)\b"
+    time_pattern = config.TIME_PATTERN
+    date_pattern = config.DATE_PATTERN
 
     time_match = re.search(time_pattern, user_text)
     date_match = re.search(date_pattern, user_text)
 
-    memo_hour = "09"
-    memo_minutes = "00"
-    date_found = None
+    memo_hour = config.DEFAULT_HOUR
+    memo_minutes = config.DEFAULT_MINUTES
+    date_found = config.DEFAULT_DATE
 
     if time_match:
         memo_hour = time_match.group(1)
@@ -23,21 +24,13 @@ def extract_time_and_date(user_text):
     if date_match:
         date_found = date_match.group(1)
 
-    day_map = {
-        "lunedì": 0, "lunedi": 0,
-        "martedì": 1, "martedi": 1,
-        "mercoledì": 2, "mercoledi": 2,
-        "giovedì": 3, "giovedi": 3,
-        "venerdì": 4, "venerdi": 4,
-        "sabato": 5,
-        "domenica": 6 
-    }
+    day_map = config.DAY_MAP
 
     today = datetime.now()
     
-    if date_found is None or date_found == "oggi":
+    if date_found is None or date_found == config.DAYS['today']:
         memo_date = today
-    elif date_found == "domani":
+    elif date_found == config.DAYS['tomorrow']:
         memo_date = today + timedelta(days=1)
     else:
         target_weekday = day_map[date_found]
@@ -60,21 +53,25 @@ def extract_time_and_date(user_text):
     return memo_title, memo_time, memo_date
 
 def write_memo(user_message, chat_id):
-    PREFIX_LIST = ["ricordami di ", "crea un promemoria ", "crea una nota ", "scrivi un promemoria ", "scrivi una nota ", "mi ricordi di "]
+    prefix_list = config.MEMO_PREFIX_LIST
+    user_text = None
 
-    for prefix in PREFIX_LIST:
+    for prefix in prefix_list:
         if user_message.startswith(prefix):
             user_text = user_message[len(prefix):]
             break
 
+    if user_text == None:
+        user_text = user_message
+
     if not user_text.strip():
-        return "Non mi ha detto cosa devo ricordarti."
+        return config.RESPONSES['missing_memo']
     
     title, time, date = extract_time_and_date(user_text)
     
     database.add_memo(chat_id, title, time, date)
 
-    return f"Fatto! Ho annotato '{title}' alle {time} il {date}." 
+    return config.TEMPLATES['memo_save'].format(title=title, time=time, date=date) 
 
 def memo_alert(bot):
     while True:
@@ -86,7 +83,7 @@ def memo_alert(bot):
         
         if expired_memos:
             for memo in expired_memos:
-                bot.send_message(memo[1], f"<b>PROMEMORIA!</b>\n\nNon scordarti di <b><i>{memo[2]}</i></b>!", parse_mode="HTML")
+                bot.send_message(memo[1], config.TEMPLATES['memo_alert'].format(memo=memo[2]), parse_mode="HTML")
 
         time.sleep(60)
 
@@ -97,10 +94,10 @@ def start_memo_alert(bot):
 def read_memos(chat_id):
     memos = database.get_memo_list(chat_id)
 
-    memo_reply = "La lista dei promemoria è vuota!"
+    memo_reply = config.RESPONSES['empty_list']
 
     if memos:
-        memo_reply = "Ecco i tuoi promemoria:\n"
+        memo_reply = config.RESPONSES['reply_list']
         
         for memo in memos:
             memo_reply += f"* {memo[0]} - {memo[1]} {memo[2]}\n"
@@ -110,4 +107,4 @@ def read_memos(chat_id):
 def clean_memos(chat_id):
     database.clean_memo_list(chat_id)
 
-    return "La lista dei promemoria è stata svuotata!"
+    return config.RESPONSES['clean_list']

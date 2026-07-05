@@ -1,0 +1,105 @@
+#intents linked to functions
+INTENTS = {
+    "memo": "memo",
+    "weather": "weather",
+    "greet": "greeting",
+    "?": "unknown"
+}
+
+#keywords for the intents
+INTENT_KEYWORDS = {
+    "memo": ["ricord", "ricordami", "annot", "scrivi", "promemoria", "nota", "segna"],
+    "weather": ["meteo", "tempo", "pioggia", "piove", "gradi", "temperatura", "ombrello", "sole"],
+    "greeting": ["ciao", "buongiorno", "buonasera", "buon pomeriggio", "salve", "buondì"]
+}
+
+#default responses
+RESPONSES = {
+    "start": "PRONTI!",
+    "help": "Per adesso non so fare molto. Posso salutare, dirti il meteo o ricordarti le cose.",
+    "unknown_replies": [
+        "6 7",
+        "C'hai detto?",
+        "'Nche senso, scusa?"
+    ],
+    "greeting": ", come posso aiutarti?",
+    "reply_list": "Ecco i tuoi promemoria:\n",
+    "empty_list": "La lista dei promemoria è vuota!",
+    "clean_list": "La lista dei promemoria è stata svuotata!",
+    "missing_memo": "Non mi ha detto cosa devo ricordarti.",
+    "missing_city": "Non sono riuscito a controllare il meteo! Controlla di aver scritto bene il nome della città.",
+    "voice_issue": "Non ho capito cosa hai detto, puoi ripetere?",
+    "voice_connection_issue": "In questo momento ho problemi a connettermi al servizio di trascrizione."
+}
+
+#templates for replies
+TEMPLATES = {
+    "weather_report": "Questo è il tempo a <b>{city}</b>:\n{condition}\n<b>{temperature}°C</b>",
+    "memo_save": "Fatto! Ho annotato '{title}' alle {time} il {date}.",
+    "memo_alert": "<b>PROMEMORIA!</b>\n\nNon scordarti di <b><i>{memo}</i></b>!"
+}
+
+#default greetings
+GREETINGS = {
+    "generic": "Ciao",
+    "morning": "Buongiorno",
+    "afternoon": "Buon pomeriggio",
+    "evening": "Buonasera"
+}
+
+#default temp audio files
+AUDIO_PATH = {
+    "ogg_path": "audio/voice.ogg",
+    "wav_path": "audio/voice.wav"
+}
+
+#weekdays map
+DAY_MAP = {
+    "lunedì": 0, "lunedi": 0,
+    "martedì": 1, "martedi": 1,
+    "mercoledì": 2, "mercoledi": 2,
+    "giovedì": 3, "giovedi": 3,
+    "venerdì": 4, "venerdi": 4,
+    "sabato": 5,
+    "domenica": 6 
+}
+
+#days
+DAYS = {
+    "today": "oggi",
+    "tomorrow": "domani"
+}
+
+#prefixes lists
+MEMO_PREFIX_LIST = [
+    "ricordami di ", 
+    "ricordami che ", 
+    "crea un promemoria ", 
+    "crea una nota ", 
+    "scrivi un promemoria ", 
+    "scrivi una nota ", 
+    "mi ricordi di ", 
+    "mi ricodi che"
+]
+
+WEATHER_PREFIX_LIST = [
+    "di", 
+    "a", 
+    "per", 
+    "su", 
+    "meteo"
+]
+
+#regex patterns
+DATE_PATTERN = r"\b(luned[ìi]|marted[ìi]|mercoled[ìi]|gioved[ìi]|venerd[ìi]|sabato|domenica|domani|oggi)\b"
+TIME_PATTERN = r"alle\s(\d{1,2})(?::(\d{2}))?"
+WEATHER_PATTERN = r"\b(" + "|".join(WEATHER_PREFIX_LIST) + r")\s+([a-z\s]+)$"
+
+#other constants
+DATABASE_NAME = "memo_data.db"
+DEFAULT_MINUTES = "00"
+DEFAULT_HOUR = "09"
+DEFAULT_DATE = None
+LANG = "it"
+LANGUAGE = "it_IT"
+WEATHER_SERVICE_URL = "https://api.weatherapi.com/v1/current.json"

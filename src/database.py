@@ -1,7 +1,8 @@
 import sqlite3
+import config
 
 def initialise():
-    connection = sqlite3.connect("memo_data.db")
+    connection = sqlite3.connect(config.DATABASE_NAME)
 
     cursor = connection.cursor()
 
@@ -19,7 +20,7 @@ def initialise():
     connection.close()
 
 def add_memo(chat_id, title, time, date):
-    connection = sqlite3.connect("memo_data.db")
+    connection = sqlite3.connect(config.DATABASE_NAME)
 
     cursor = connection.cursor()
 
@@ -29,7 +30,7 @@ def add_memo(chat_id, title, time, date):
     connection.close()
 
 def check_memo(time, date):
-    connection = sqlite3.connect("memo_data.db")
+    connection = sqlite3.connect(config.DATABASE_NAME)
 
     cursor = connection.cursor()
 
@@ -48,7 +49,7 @@ def check_memo(time, date):
     return expired_memos
 
 def get_memo_list(chat_id):
-    connection = sqlite3.connect("memo_data.db")
+    connection = sqlite3.connect(config.DATABASE_NAME)
 
     cursor = connection.cursor()
 
@@ -62,7 +63,7 @@ def get_memo_list(chat_id):
     return memo_list
 
 def clean_memo_list(chat_id):
-    connection = sqlite3.connect("memo_data.db")
+    connection = sqlite3.connect(config.DATABASE_NAME)
 
     cursor = connection.cursor()
 
