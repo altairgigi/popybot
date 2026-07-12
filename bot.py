@@ -3,7 +3,7 @@ import random
 import telebot
 import speech_recognition
 from dotenv import load_dotenv
-from src import greet, memo, voice, weather
+from src import greet, memo, voice, weather, engine
 import config
 
 load_dotenv()
@@ -12,30 +12,29 @@ TOKEN = os.environ.get("TELEGRAM_TOKEN")
 
 bot = telebot.TeleBot(TOKEN)
 
-def decode_intent(user_message):
-    for intent, keywords in config.INTENT_KEYWORDS.items():
-        for word in keywords:
-            if word in user_message:
-                return intent
-        
-    return config.INTENTS['?']
+def process_message(message, user_text):
+    user_intent = engine.decode_intent(user_text)
 
-def process_intent(message, user_text):
-    user_intent = decode_intent(user_text)
+    if user_intent is not None:
+        entities = engine.extract_entities(user_text, user_intent)
 
-    if user_intent == config.INTENTS['greet']:
-        bot.send_message(message.chat.id, greet.greet_user())
+        if user_intent == config.INTENTS['greet']:
+            bot.send_message(message.chat.id, greet.greet_user())
 
-    elif user_intent == config.INTENTS['memo']:
-        bot.send_message(message.chat.id, memo.write_memo(user_text, message.chat.id))
+        elif user_intent == config.INTENTS['memo']:
+            title = entities['action']
+            time = entities['time']
+            date = entities['date']
+            bot.send_message(message.chat.id, memo.write_memo(message.chat.id, title, time, date))
 
-    elif user_intent == config.INTENTS['weather']:
-        bot.send_message(message.chat.id, weather.get_weather(user_text), parse_mode="HTML")
-
+        elif user_intent == config.INTENTS['weather']:
+            city = entities['location']
+            bot.send_message(message.chat.id, weather.get_weather(city), parse_mode="HTML")
     else:
         replies_list = config.RESPONSES['unknown_replies']
         random_choice = random.choice(replies_list)
         bot.reply_to(message, random_choice)
+
 
 @bot.message_handler(commands = ['start'])
 def welcome(message):
@@ -66,7 +65,7 @@ def voice_handler(message):
 
         user_text = transcribed_text.lower()    
 
-        process_intent(message, user_text)
+        process_message(message, user_text)
     except speech_recognition.UnknownValueError:
         bot.send_message(message.chat.id, config.RESPONSES['voice_issue'])
     
@@ -85,4 +84,4 @@ def voice_handler(message):
 def message_handler(message):
     user_text = message.text.lower()
 
-    process_intent(message, user_text)
+    process_message(message, user_text)

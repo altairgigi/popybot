@@ -1,73 +1,69 @@
 import re
 import time
 import threading
-from datetime import datetime, timedelta
+import dateparser
+from datetime import datetime
 from src import database
 import config
 
-def extract_time_and_date(user_text):
-    time_pattern = config.TIME_PATTERN
-    date_pattern = config.DATE_PATTERN
-
-    time_match = re.search(time_pattern, user_text)
-    date_match = re.search(date_pattern, user_text)
-
+def extract_time_and_date(time_raw, date_raw):
     memo_hour = config.DEFAULT_HOUR
     memo_minutes = config.DEFAULT_MINUTES
-    date_found = config.DEFAULT_DATE
+    memo_date = datetime.now()
 
-    if time_match:
-        memo_hour = time_match.group(1)
-        if time_match.group(2):
-            memo_minutes = time_match.group(2)
+    translation_rules = config.TRANSLATIONS.get(config.LANG, {"idiomatic_times": {}, "removables": []})
 
-    if date_match:
-        date_found = date_match.group(1)
+    components = []
+    if date_raw:
+        date_clean = str(date_raw).lower().strip()
 
-    day_map = config.DAY_MAP
+        date_clean = re.sub(config.ARTICLE_TO_QUANTITY, "1", date_clean)
 
-    today = datetime.now()
-    
-    if date_found is None or date_found == config.DAYS['today']:
-        memo_date = today
-    elif date_found == config.DAYS['tomorrow']:
-        memo_date = today + timedelta(days=1)
-    else:
-        target_weekday = day_map[date_found]
-        current_weekday = today.weekday()
+        for prefix in translation_rules["removables"]:
+            date_clean = date_clean.replace(prefix, "").strip()
 
-        difference_days = target_weekday - current_weekday 
+        components.append(date_clean)
+    if time_raw:
+        time_clean = str(time_raw).lower().strip()
 
-        if difference_days <= 0:
-            difference_days += 7
+        for expression, translation in translation_rules["idiomatic_times"].items():
+            time_clean = time_clean.replace(expression, translation)
 
-        memo_date = today + timedelta(days=difference_days)
+        components.append(time_clean)
 
-    memo_title = re.sub(time_pattern, "", user_text).strip()
-    memo_title = re.sub(date_pattern, "", memo_title).strip()
+    temp_text = " ".join(components).strip()
+
+    settings = {
+        'PREFER_DATES_FROM': 'future',
+        'RETURN_AS_TIMEZONE_AWARE': False,
+        'RELATIVE_BASE': datetime.now(),
+    }
+
+    parsed = None
+    if temp_text:
+        parsed = dateparser.parse(
+            temp_text, 
+            languages=[config.LANG], 
+            settings=settings
+        )
+
+        if parsed:
+            memo_date = parsed
+
+            if time_raw:
+                memo_hour = parsed.strftime("%H")
+                memo_minutes = parsed.strftime("%M")
 
     memo_time = f"{memo_hour}:{memo_minutes}"
-
     memo_date = memo_date.strftime("%d/%m/%Y")
 
-    return memo_title, memo_time, memo_date
+    return memo_time, memo_date
 
-def write_memo(user_message, chat_id):
-    prefix_list = config.MEMO_PREFIX_LIST
-    user_text = None
-
-    for prefix in prefix_list:
-        if user_message.startswith(prefix):
-            user_text = user_message[len(prefix):]
-            break
-
-    if user_text == None:
-        user_text = user_message
-
-    if not user_text.strip():
+def write_memo(chat_id, title, time_raw, date_raw):
+    if not title.strip():
         return config.RESPONSES['missing_memo']
     
-    title, time, date = extract_time_and_date(user_text)
+    time, date = extract_time_and_date(time_raw, date_raw)
     
     database.add_memo(chat_id, title, time, date)
 

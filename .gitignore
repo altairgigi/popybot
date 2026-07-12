@@ -11,3 +11,4 @@ venv/
 *.txt
 *.ogg
 *.wav
+*.pth

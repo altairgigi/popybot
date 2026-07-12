@@ -9,18 +9,7 @@ load_dotenv()
 API_KEY = os.environ.get("WEATHER_API_KEY")
 URL = config.WEATHER_SERVICE_URL
 
-def get_city(user_message):
-    user_text = user_message.replace("?", "").strip()
-
-    city_match = re.search(config.WEATHER_PATTERN, user_text)
-
-    if city_match:
-        return city_match.group(2).strip()
-    
-    return user_text
-
-def get_weather(user_message):
-    city = get_city(user_message)
+def get_weather(city):
     parameters = {"key": API_KEY, "q": city, "lang": config.LANG}
     
     try:
@@ -33,7 +22,7 @@ def get_weather(user_message):
             city=weather_data['location']['name'],
             condition=weather_data['current']['condition']['text'],
             temperature=weather_data['current']['temp_c']
-            )
+        )
     
     except requests.exceptions.RequestException as e:
         print(f"Error in API request: {e}")
