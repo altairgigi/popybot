@@ -28,8 +28,9 @@ def process_message(message, user_text):
             bot.send_message(message.chat.id, memo.write_memo(message.chat.id, title, time, date))
 
         elif user_intent == config.INTENTS['weather']:
-            city = entities['location']
-            bot.send_message(message.chat.id, weather.get_weather(city), parse_mode="HTML")
+            location = entities['location']
+            when = entities['date']
+            bot.send_message(message.chat.id, weather.get_weather(location, when), parse_mode="HTML")
     else:
         replies_list = config.RESPONSES['unknown_replies']
         random_choice = random.choice(replies_list)
@@ -77,8 +78,6 @@ def voice_handler(message):
             os.remove(config.AUDIO_PATH['ogg_path'])
         if os.path.exists(config.AUDIO_PATH['wav_path']):
             os.remove(config.AUDIO_PATH['wav_path'])
-
-
 
 @bot.message_handler(func=lambda message: True)
 def message_handler(message):

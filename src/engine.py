@@ -1,24 +1,12 @@
 import gc
+import re
 import torch
-import spacy
 import numpy
-from spacy.matcher import Matcher
-from src.nltk_utils import tokenise, stem, bag_of_words
+import dateparser.search
+from datetime import datetime
+from src.nltk_utils import tokenise, bag_of_words
 from src.model import NeuralNet
 import config
-
-nlp = spacy.load('it_core_news_sm')
-
-matcher = Matcher(nlp.vocab)
-
-date_idioms_pattern = config.DATE_IDIOMS
-day_of_week_pattern = config.DAY_OF_WEEK
-time_of_day_pattern = config.TIME_IDIOMS
-
-custom_date_pattern = [date_idioms_pattern, day_of_week_pattern] + config.DATE_DURATIONS
-
-matcher.add("CUSTOM DATE", custom_date_pattern)
-matcher.add("CUSTOM TIME", time_of_day_pattern)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -63,51 +51,60 @@ def decode_intent(message):
     return None
 
 def extract_entities(message, intent):
-    doc = nlp(message)
-    entities = {"action": None, "date": None, "time": None}
+    entities = {"action": None, "date": None, "time": None, "location": None}
+    clean_text = message.replace("?", "").replace(".", "").strip()
+
+    matches = dateparser.search.search_dates(
+        clean_text,
+        languages=[config.LANG],
+        settings={
+            'PREFER_DATES_FROM': 'future',
+            'RELATIVE_BASE': datetime.now()
+        }
+    )
+
+    print("Tutti i match trovati:", matches)
+
+    if matches:
+        text, temporal_data = matches[0]
+        
+        entities['date'] = temporal_data.strftime("%d/%m/%Y")
+
+        clean_text = clean_text.replace(text, "").strip()
 
     if intent == "weather":
-        locations = [ent.text for ent in doc.ents if ent.label_ in ["LOC", "GPE"]]
-        entities["location"] = locations[0] if locations else None
-
-    elif intent == "memo":
-        date_ent = []
-        time_ent = []
-
-        matches = matcher(doc)
-        match_indexes = set()
-
-        for match_id, start, end in matches:
-            string_id = nlp.vocab.strings[match_id]
-            span = doc[start:end]
-
-            for index in range(start, end):
-                match_indexes.add(index)
-
-            if string_id == "CUSTOM DATE":
-                date_ent.append(span.text)
-            elif string_id == "CUSTOM TIME":
-                time_ent.append(span.text)
-
-        for ent in doc.ents:
-            if(ent.label_ == "DATE"):
-                date_ent.append(ent)
-            elif(ent.label_ == "TIME"):
-                time_ent.append(ent)
-
-        entities["date"] = date_ent[0] if date_ent else None
-        entities["time"] = time_ent[0] if time_ent else None
+        for prefix in config.WEATHER_PREFIX_LIST:
+            if clean_text.lower().startswith(prefix):
+                clean_text = clean_text[len(prefix):].strip()
         
-        action = message
-        for t in time_ent:
-            action = action.replace(t, "")
-        for d in date_ent:
-            action = action.replace(d, "")
-        
-        for trigger in config.MEMO_PREFIX_LIST:
-            if action.lower().startswith(trigger):
-                action = action[len(trigger):].strip()
-                
-        entities["action"] = action.strip(", ")
+        city_match = re.search(config.WEATHER_PATTERN, clean_text, re.IGNORECASE)
+
+        if city_match:
+            entities['location'] = city_match.group(2).strip()
+        else:
+            entities['location'] = clean_text
+
+    if intent == 'memo':
+        for prefix in config.MEMO_PREFIX_LIST:
+            if clean_text.lower().startswith(prefix):
+                clean_text = clean_text[len(prefix):].strip()
+
+        time_match = re.search(config.TIME_PATTERN, clean_text, re.IGNORECASE)
+
+        memo_hour = config.DEFAULT_HOUR
+        memo_minutes = config.DEFAULT_MINUTES
+
+        if time_match:
+            memo_hour = time_match.group(1).zfill(2)
+            if time_match.group(2):
+                memo_minutes = time_match.group(2)
+            
+            clean_text = re.sub(config.TIME_PATTERN, "", clean_text).strip()
+
+            entities['time'] = f"{memo_hour}:{memo_minutes}"
+
+    entities["action"] = clean_text.strip(", ")
+
+    print(entities)
 
     return entities

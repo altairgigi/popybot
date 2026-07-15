@@ -27,7 +27,9 @@ RESPONSES = {
 
 #templates for replies
 TEMPLATES = {
-    "weather_report": "Questo è il tempo a <b>{city}</b>:\n{condition}\n<b>{temperature}°C</b>",
+    "weather_report": "Questo è il tempo a <b>{location}</b>:\n{condition}\n<b>{temperature}°C</b>",
+    "forecast_header": "Questo è il tempo a <b>{location}</b> nei prossimi giorni:",
+    "forecast_report": "<b>{date}</b>:\n{condition}\nMassima: <b>{temp_max}°C</b>\nMinima: <b>{temp_min}°C</b>",
     "memo_save": "Fatto! Ho annotato '{title}' alle {time} il {date}.",
     "memo_alert": "<b>PROMEMORIA!</b>\n\nNon scordarti di <b><i>{memo}</i></b>!"
 }
@@ -59,47 +61,6 @@ TRANSLATIONS = {
     }
 }
 
-#custom patters for spacy
-DATE_IDIOMS = [
-    {"LOWER": {"IN": ["domani", "dopodomani", "stasera", "oggi", "ieri"]}}
-]
-
-DATE_DURATIONS = [
-    [
-        {"LOWER": {"IN": ["fra", "tra", "in"]}},
-        {"LIKE_NUM": True},
-        {"LOWER": {"IN": ["settimana", "settimane", "mese", "mesi", "anno", "anni", "giorno", "giorni"]}}
-    ],
-    [
-        {"LOWER": {"IN": ["fra", "tra", "in"]}},
-        {"LOWER": {"IN": ["un", "uno", "una"]}},
-        {"LOWER": {"IN": ["settimana", "settimane", "mese", "mesi", "anno", "anni", "giorno", "giorni"]}}
-    ]
-]
-
-DAY_OF_WEEK = [
-    {"LOWER": {"IN": ["lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato", "domenica"]}}
-]
-
-TIME_IDIOMS = [
-    [
-        {"LOWER": {"IN": ["l'", "all'"]}, "OP": "?"}, 
-        {"LOWER": {"IN": ["mezzogiorno", "mezzanotte"]}}
-    ],
-    [
-        {"LOWER": {"IN": ["l'", "all'"]}}, 
-        {"LOWER": "una"}
-    ],
-    [
-        {"LOWER": "una"},
-        {"LOWER": {"IN": ["di", "del", "in"]}},
-        {"LOWER": {"IN": ["notte", "pomeriggio", "mattina", "punto"]}}
-    ]
-]
-
-#regex to substitute articles with quantity
-ARTICLE_TO_QUANTITY = r"\b(un|uno|una)\b"
-
 #days
 DAYS = {
     "today": "oggi",
@@ -129,6 +90,11 @@ WEATHER_PREFIX_LIST = [
     "meteo"
 ]
 
+#regex patterns
+ARTICLE_TO_QUANTITY = r"\b(un|una|uno)"
+TIME_PATTERN = r"alle\s(\d{1,2})(?::(\d{2}))?"
+WEATHER_PATTERN = r"\b(" + "|".join(WEATHER_PREFIX_LIST) + r")\s+([a-z\s]+)"
+
 #default values
 DATABASE_NAME = "memo_data.db"
 MODEL_DATA = 'src/data.pth'
@@ -137,3 +103,4 @@ DEFAULT_HOUR = "09"
 LANG = "it"
 LANGUAGE = "it_IT"
 WEATHER_SERVICE_URL = "https://api.weatherapi.com/v1/current.json"
+FORECAST_SERVICE_URL = "https://api.weatherapi.com/v1/forecast.json"

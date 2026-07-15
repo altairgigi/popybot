@@ -33,6 +33,11 @@ def extract_time_and_date(time_raw, date_raw):
 
     temp_text = " ".join(components).strip()
 
+    print("\n--- DEBUG MEMO ---")
+    print(f"Date raw ricevuto: '{date_raw}'")
+    print(f"Time raw ricevuto: '{time_raw}'")
+    print(f"Testo unito per dateparser: '{temp_text}'")
+
     settings = {
         'PREFER_DATES_FROM': 'future',
         'RETURN_AS_TIMEZONE_AWARE': False,
@@ -47,6 +52,8 @@ def extract_time_and_date(time_raw, date_raw):
             settings=settings
         )
 
+        print(f"Risultato dateparser (parsed): '{parsed}'")
+
         if parsed:
             memo_date = parsed
 
@@ -56,6 +63,9 @@ def extract_time_and_date(time_raw, date_raw):
 
     memo_time = f"{memo_hour}:{memo_minutes}"
     memo_date = memo_date.strftime("%d/%m/%Y")
+
+    print(f"Output finale restituito - Ora: '{memo_time}', Data: '{memo_date}'")
+    print("------------------\n")
 
     return memo_time, memo_date
 
