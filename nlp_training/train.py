@@ -94,8 +94,8 @@ def train():
     #print(f"Shape of y_train: {Y_train.shape}")
 
     #print("=== MODEL TEST ===")
-    #print("Modello creato con successo e pronto per l'addestramento!")
-    #print(f"Configurazione: Input={input_size}, Nascosti={hidden_size}, Output={output_size}")
+    #print("Model created with success and ready for training!")
+    #print(f"Settings: Input={input_size}, Hidden={hidden_size}, Output={output_size}")
 
 class BotDataSet(Dataset):
     def __init__(self, X_data, Y_data):

@@ -12,3 +12,7 @@ venv/
 *.ogg
 *.wav
 *.pth
+*.onnx
+*.tflite
+*.data
+metadata.json

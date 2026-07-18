@@ -1,33 +1,26 @@
-import gc
 import re
-import torch
+import json
 import numpy
+import ai_edge_litert.interpreter as litert
 import dateparser.search
 from datetime import datetime
 from src.nltk_utils import tokenise, bag_of_words
-from src.model import NeuralNet
 import config
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+with open(config.META_DATA, "r", encoding="utf-8") as data:
+    metadata = json.load(data)
 
-FILE = config.MODEL_DATA
-data = torch.load(FILE, map_location=device)
+all_words = metadata["all_words"]
+tags = metadata["tags"]
 
-input_size = data["input_size"]
-hidden_size = data["hidden_size"]
-output_size = data["output_size"]
-all_words = data["all_words"]
-tags = data["tags"]
-model_state = data["model_state"]
+del metadata
 
-model = NeuralNet(input_size, hidden_size, output_size).to(device)
-model.load_state_dict(model_state)
-model.eval()
+MODEL = config.MODEL_DATA
+interpreter = litert.Interpreter(model_path=MODEL)
+interpreter.allocate_tensors()
 
-torch.set_grad_enabled(False)
-
-del data
-gc.collect()
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 def decode_intent(message):
     tokenised = tokenise(message)
@@ -36,15 +29,18 @@ def decode_intent(message):
     if numpy.sum(X) == 0:
         return None
     
-    X = X.reshape(1, X.shape[0])
-    X = torch.from_numpy(X).to(device, dtype=torch.float32)
+    X = X.reshape(1, X.shape[0]).astype(numpy.float32)
 
-    outputs = model(X)
-    _, predicted = torch.max(outputs, dim=1)
-    intent = tags[predicted.item()]
+    interpreter.set_tensor(input_details[0]['index'], X)
+    interpreter.invoke()
+    outputs = interpreter.get_tensor(output_details[0]['index'])
 
-    probs = torch.softmax(outputs, dim=1)
-    prob = probs[0][predicted.item()].item()
+    predicted_idx = numpy.argmax(outputs, axis=1)[0]
+    intent = tags[predicted_idx]
+
+    exp_outputs = numpy.exp(outputs - numpy.max(outputs))
+    probs = exp_outputs / numpy.sum(exp_outputs, axis=1, keepdims=True)
+    prob = probs[0][predicted_idx]
 
     if prob > 0.75:
         return intent
@@ -54,23 +50,34 @@ def extract_entities(message, intent):
     entities = {"action": None, "date": None, "time": None, "location": None}
     clean_text = message.replace("?", "").replace(".", "").strip()
 
+    translation_rules = config.TRANSLATIONS.get(config.LANG, {"idiomatic_times": {}})
+    removables_list = config.TRANSLATIONS.get(config.LANG, {"removables": []})
+    removables = r"(?:\b(?:" + "|".join(removables_list) + r")\b['\s]*)*"
+    for word, value in translation_rules['idiomatic_times'].items():
+        pattern = r"\b" + re.escape(word) + r"\b"
+        if re.search(pattern, clean_text, re.IGNORECASE):
+            entities['time'] = value
+            clean_text = re.sub(removables + pattern, "", clean_text, flags=re.IGNORECASE)
+            break
+
     matches = dateparser.search.search_dates(
         clean_text,
         languages=[config.LANG],
         settings={
             'PREFER_DATES_FROM': 'future',
+            'RETURN_AS_TIMEZONE_AWARE': False,
             'RELATIVE_BASE': datetime.now()
         }
     )
-
-    print("Tutti i match trovati:", matches)
 
     if matches:
         text, temporal_data = matches[0]
         
         entities['date'] = temporal_data.strftime("%d/%m/%Y")
 
-        clean_text = clean_text.replace(text, "").strip()
+        clean_text = re.sub(config.PREFIX_PATTERN + re.escape(text), "", clean_text, flags=re.IGNORECASE)
+    else:
+        entities['date'] = datetime.now().date().strftime("%d/%m/%Y")
 
     if intent == "weather":
         for prefix in config.WEATHER_PREFIX_LIST:
@@ -104,7 +111,5 @@ def extract_entities(message, intent):
             entities['time'] = f"{memo_hour}:{memo_minutes}"
 
     entities["action"] = clean_text.strip(", ")
-
-    print(entities)
 
     return entities

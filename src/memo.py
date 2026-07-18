@@ -1,79 +1,12 @@
-import re
 import time
 import threading
-import dateparser
 from datetime import datetime
 from src import database
 import config
 
-def extract_time_and_date(time_raw, date_raw):
-    memo_hour = config.DEFAULT_HOUR
-    memo_minutes = config.DEFAULT_MINUTES
-    memo_date = datetime.now()
-
-    translation_rules = config.TRANSLATIONS.get(config.LANG, {"idiomatic_times": {}, "removables": []})
-
-    components = []
-    if date_raw:
-        date_clean = str(date_raw).lower().strip()
-
-        date_clean = re.sub(config.ARTICLE_TO_QUANTITY, "1", date_clean)
-
-        for prefix in translation_rules["removables"]:
-            date_clean = date_clean.replace(prefix, "").strip()
-
-        components.append(date_clean)
-    if time_raw:
-        time_clean = str(time_raw).lower().strip()
-
-        for expression, translation in translation_rules["idiomatic_times"].items():
-            time_clean = time_clean.replace(expression, translation)
-
-        components.append(time_clean)
-
-    temp_text = " ".join(components).strip()
-
-    print("\n--- DEBUG MEMO ---")
-    print(f"Date raw ricevuto: '{date_raw}'")
-    print(f"Time raw ricevuto: '{time_raw}'")
-    print(f"Testo unito per dateparser: '{temp_text}'")
-
-    settings = {
-        'PREFER_DATES_FROM': 'future',
-        'RETURN_AS_TIMEZONE_AWARE': False,
-        'RELATIVE_BASE': datetime.now(),
-    }
-
-    parsed = None
-    if temp_text:
-        parsed = dateparser.parse(
-            temp_text, 
-            languages=[config.LANG], 
-            settings=settings
-        )
-
-        print(f"Risultato dateparser (parsed): '{parsed}'")
-
-        if parsed:
-            memo_date = parsed
-
-            if time_raw:
-                memo_hour = parsed.strftime("%H")
-                memo_minutes = parsed.strftime("%M")
-
-    memo_time = f"{memo_hour}:{memo_minutes}"
-    memo_date = memo_date.strftime("%d/%m/%Y")
-
-    print(f"Output finale restituito - Ora: '{memo_time}', Data: '{memo_date}'")
-    print("------------------\n")
-
-    return memo_time, memo_date
-
-def write_memo(chat_id, title, time_raw, date_raw):
+def write_memo(chat_id, title, time, date):
     if not title.strip():
         return config.RESPONSES['missing_memo']
-    
-    time, date = extract_time_and_date(time_raw, date_raw)
     
     database.add_memo(chat_id, title, time, date)
 

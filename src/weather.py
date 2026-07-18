@@ -1,5 +1,4 @@
 import os
-import dateparser
 from datetime import datetime
 import requests
 from dotenv import load_dotenv
@@ -12,24 +11,16 @@ WEATHER_URL = config.WEATHER_SERVICE_URL
 FORECAST_URL = config.FORECAST_SERVICE_URL
 
 def get_weather(location, when):
-    if when == config.DAYS['today'] or when is None:
+    today = datetime.now().date().strftime("%d/%m/%Y")
+    
+    if when == today or when is None:
         weather = get_current_weather(location)
     else:
-        parsed_date = dateparser.parse(
-            when,
-            languages=[config.LANG],
-            settings={'PREFER_DATES_FROM': 'future', 'RELATIVE_BASE': datetime.now()}
-        )
+        f_when = datetime.strptime(when, "%d/%m/%Y")
+        f_today = datetime.strptime(today, "%d/%m/%Y")
 
-        if parsed_date:
-            date = parsed_date.date()
-            
-            delta_days = (date - datetime.now().date()).days
-
-            days = delta_days + 1
-        else: 
-            days = 1
-            
+        days = (f_when - f_today).days + 1
+    
         weather = get_weather_forecast(location, days)
 
     return weather

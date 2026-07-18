@@ -1,9 +1,10 @@
 import os
 import random
+import requests
 import telebot
 import speech_recognition
 from dotenv import load_dotenv
-from src import greet, memo, voice, weather, engine
+from src import engine, greet, memo, voice, weather
 import config
 
 load_dotenv()
@@ -32,10 +33,33 @@ def process_message(message, user_text):
             when = entities['date']
             bot.send_message(message.chat.id, weather.get_weather(location, when), parse_mode="HTML")
     else:
+        IP = os.environ.get("FALLBACK_DEVICE_IP")
+        PORT = os.environ.get("FALLBACK_DEVICE_PORT")
+        MODEL = os.environ.get("FALLBACK_MODEL")
+        URL = f"http://{IP}:{PORT}/api/generate"
+
+        payload = {
+            "model": MODEL,
+            "prompt": user_text,
+            "stream": False
+        }
+
+        try:
+            response = requests.post(URL, json=payload, timeout=10)
+            if response.status_code == 200:
+                result = response.json()
+                reply = result.get("response")
+                bot.reply(message, reply)
+            else:
+                print(f"Error: status code {response.status_code}")
+        except requests.exceptions.Timeout:
+            print("Timeout Error: the fallback device took too long to answer!")
+        except requests.exceptions.ConnectionError:
+            print("Connection Error: impossible to connect to server!")
+        
         replies_list = config.RESPONSES['unknown_replies']
         random_choice = random.choice(replies_list)
         bot.reply_to(message, random_choice)
-
 
 @bot.message_handler(commands = ['start'])
 def welcome(message):

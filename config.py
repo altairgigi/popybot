@@ -57,15 +57,11 @@ TRANSLATIONS = {
             "mezzogiorno": "12:00",
             "mezzanotte": "00:00"
         },
-        "removables": ["fra ", "tra ", "in "]
+        "idiomatic_dates": {
+            "dopodomani": "fra 2 giorni"
+        },
+        "removables": ["di", "a", "verso", "per"]
     }
-}
-
-#days
-DAYS = {
-    "today": "oggi",
-    "tomorrow": "domani",
-    "dayafter": "dopodomani"
 }
 
 #prefixes lists
@@ -90,14 +86,26 @@ WEATHER_PREFIX_LIST = [
     "meteo"
 ]
 
+GENERIC_PREFIX_LIST = [
+    "il",
+    "tra",
+    "fra",
+    "verso",
+    "le",
+    "per"
+]
+
 #regex patterns
-ARTICLE_TO_QUANTITY = r"\b(un|una|uno)"
-TIME_PATTERN = r"alle\s(\d{1,2})(?::(\d{2}))?"
+ARTICLES = r"\b(un|una|uno)"
+PREPOSITIONS = r"\b(il|tra|fra|per)"
+PREFIX_PATTERN = r"(?:\b(?:" + "|".join(GENERIC_PREFIX_LIST) + r")\b\s*)*"
+TIME_PATTERN = PREFIX_PATTERN + r"(?:a|alle|le)?\s(\d{1,2})(?::(\d{2}))?"
 WEATHER_PATTERN = r"\b(" + "|".join(WEATHER_PREFIX_LIST) + r")\s+([a-z\s]+)"
 
 #default values
 DATABASE_NAME = "memo_data.db"
-MODEL_DATA = 'src/data.pth'
+MODEL_DATA = "src/model.tflite"
+META_DATA = "src/metadata.json"
 DEFAULT_MINUTES = "00"
 DEFAULT_HOUR = "09"
 LANG = "it"
