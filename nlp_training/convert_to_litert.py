@@ -35,7 +35,7 @@ def convert_model():
         edge_model = litert_torch.convert(model, sample_inputs)
         edge_model.export(OUTPUT_MODEL)
 
-        print("Conversion completed!")
+        print("Conversion to tflite completed!")
     except Exception as e:
         print(f"Error during conversion: {e}!")
 
@@ -47,8 +47,8 @@ def convert_model():
     with open(OUTPUT_METADATA, "w", encoding="utf-8") as file:
         json.dump(metadata, file, ensure_ascii=False, indent=4)
     
-    print("Success!")
-    print("Conversion completed!")
+    print("Export to json completed!")
+    print("Conversion was successfull!")
 
 if __name__ == "__main__":
     convert_model()

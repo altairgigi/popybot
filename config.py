@@ -9,7 +9,10 @@ INTENTS = {
 #default responses
 RESPONSES = {
     "start": "PRONTI!",
-    "help": "Per adesso non so fare molto. Posso salutare, dirti il meteo o ricordarti le cose.",
+    "help": "Ciao! Io sono PoPyBot, il tuo assistente virtuale Telegram scritto interamente in Python!\n"
+            "Attualmente, posso dirti il meteo (es. 'che tempo fa a Roma?') e ricordarti le cose (es. 'ricordami di fare la spesa domani alle 11') in maniera completamente autonoma.\n"
+            "Inoltre, per richieste più complesse, posso chiedere aiuto al mio cervello di riserva ospitato su Ollama.\n"
+            "Dimmi pure cosa ti serve e cerchero di aiutarti come posso!",
     "unknown_replies": [
         "6 7",
         "C'hai detto?",
@@ -28,8 +31,8 @@ RESPONSES = {
 #templates for replies
 TEMPLATES = {
     "weather_report": "Questo è il tempo a <b>{location}</b>:\n{condition}\n<b>{temperature}°C</b>",
-    "forecast_header": "Questo è il tempo a <b>{location}</b> nei prossimi giorni:",
-    "forecast_report": "<b>{date}</b>:\n{condition}\nMassima: <b>{temp_max}°C</b>\nMinima: <b>{temp_min}°C</b>",
+    "forecast_header": "Questo è il tempo a <b>{location}</b> nei prossimi giorni:\n",
+    "forecast_report": "<b>{date}</b>:\n{condition}\nMassima: <b>{temp_max}°C</b>\nMinima: <b>{temp_min}°C</b>\n",
     "memo_save": "Fatto! Ho annotato '{title}' alle {time} il {date}.",
     "memo_alert": "<b>PROMEMORIA!</b>\n\nNon scordarti di <b><i>{memo}</i></b>!"
 }
@@ -52,10 +55,10 @@ AUDIO_PATH = {
 TRANSLATIONS = {
     "it": {
         "idiomatic_times": {
-            "all'una": "13:00",
-            "l'una": "13:00",
-            "mezzogiorno": "12:00",
-            "mezzanotte": "00:00"
+            "all'una": "alle 13:00",
+            "l'una": "alle 13:00",
+            "a mezzogiorno": "alle 12:00",
+            "a mezzanotte": "alle 00:00"
         },
         "idiomatic_dates": {
             "dopodomani": "fra 2 giorni"
@@ -87,6 +90,7 @@ WEATHER_PREFIX_LIST = [
 ]
 
 GENERIC_PREFIX_LIST = [
+    "a",
     "il",
     "tra",
     "fra",
@@ -99,6 +103,7 @@ GENERIC_PREFIX_LIST = [
 ARTICLES = r"\b(un|una|uno)"
 PREPOSITIONS = r"\b(il|tra|fra|per)"
 PREFIX_PATTERN = r"(?:\b(?:" + "|".join(GENERIC_PREFIX_LIST) + r")\b\s*)*"
+MEMO_PATTERN = r".*?\b(?:" + "|".join(MEMO_PREFIX_LIST) + r"\b)"
 TIME_PATTERN = PREFIX_PATTERN + r"(?:a|alle|le)?\s(\d{1,2})(?::(\d{2}))?"
 WEATHER_PATTERN = r"\b(" + "|".join(WEATHER_PREFIX_LIST) + r")\s+([a-z\s]+)"
 

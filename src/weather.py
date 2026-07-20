@@ -50,7 +50,7 @@ def get_weather_forecast(location, when):
         days = 14
     else:
         days = when
-    print(f"DEBUG: days: {days} and when: {when}")
+        
     parameters = {"key": API_KEY, "q": location, "days": days, "lang": config.LANG}
     
     try:

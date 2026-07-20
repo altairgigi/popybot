@@ -16,7 +16,7 @@ bot = telebot.TeleBot(TOKEN)
 def process_message(message, user_text):
     user_intent = engine.decode_intent(user_text)
 
-    if user_intent is not None:
+    if user_intent is not None and user_intent != config.INTENTS['?']:
         entities = engine.extract_entities(user_text, user_intent)
 
         if user_intent == config.INTENTS['greet']:
@@ -45,13 +45,14 @@ def process_message(message, user_text):
         }
 
         try:
-            response = requests.post(URL, json=payload, timeout=10)
+            response = requests.post(URL, json=payload, timeout=(10, 120))
             if response.status_code == 200:
                 result = response.json()
                 reply = result.get("response")
-                bot.reply(message, reply)
+                bot.reply_to(message, reply)
+                return
             else:
-                print(f"Error: status code {response.status_code}")
+                print(f"Error: status code {response.status_code}!")
         except requests.exceptions.Timeout:
             print("Timeout Error: the fallback device took too long to answer!")
         except requests.exceptions.ConnectionError:

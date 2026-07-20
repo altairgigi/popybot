@@ -85,18 +85,6 @@ def train():
     torch.save(data, FILE)
     print("Training file created with success!")
 
-    #print("=== LOADING TEST ===")
-    #print(f"Unique tags found ({len(tags)}): {tags}")
-    #print(f"Number of unique words in the vocabulary: {len(all_words)}")
-    #print(f"First 10 elements in the vocabulary: {all_words[:10]}")
-    #print(f"Total number of pattern-tag pairs (xy): {len(xy)}")
-    #print(f"Shape of X_train: {X_train.shape}")
-    #print(f"Shape of y_train: {Y_train.shape}")
-
-    #print("=== MODEL TEST ===")
-    #print("Model created with success and ready for training!")
-    #print(f"Settings: Input={input_size}, Hidden={hidden_size}, Output={output_size}")
-
 class BotDataSet(Dataset):
     def __init__(self, X_data, Y_data):
         self.n_samples = len(X_data)
