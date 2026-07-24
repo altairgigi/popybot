@@ -10,6 +10,10 @@ import config
 load_dotenv()
 
 TOKEN = os.environ.get("TELEGRAM_TOKEN")
+IP = os.environ.get("FALLBACK_DEVICE_IP")
+PORT = os.environ.get("FALLBACK_DEVICE_PORT")
+MODEL = os.environ.get("LOCAL_MODEL")
+URL = f"http://{IP}:{PORT}/api/generate"
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -33,11 +37,6 @@ def process_message(message, user_text):
             when = entities['date']
             bot.send_message(message.chat.id, weather.get_weather(location, when), parse_mode="HTML")
     else:
-        IP = os.environ.get("FALLBACK_DEVICE_IP")
-        PORT = os.environ.get("FALLBACK_DEVICE_PORT")
-        MODEL = os.environ.get("FALLBACK_MODEL")
-        URL = f"http://{IP}:{PORT}/api/generate"
-
         payload = {
             "model": MODEL,
             "prompt": user_text,

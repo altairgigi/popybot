@@ -21,7 +21,7 @@ You can also add IP and port settings for your local model with:
 ```
 FALLBACK_DEVICE_IP="INSERT-IP-HERE"
 FALLBACK_DEVICE_PORT="INSERT-PORT-NUMBER-HERE"
-FALLBACK_MODEL="INSERT-NAME-OF-THE-LOCAL-MODEL"
+LOCAL_MODEL="INSERT-NAME-OF-THE-LOCAL-MODEL"
 ```
 
 4) Train the bot with the `train.py` script and convert it to .ftlite with the `convert_to_litert.py` script you can find in the `nlp_training\` folder (more down below). 
@@ -31,15 +31,15 @@ FALLBACK_MODEL="INSERT-NAME-OF-THE-LOCAL-MODEL"
 6) Start the bot with
 ```bash
 #windows
-pithon main.py
+python main.py
 ```
 or
 ```bash
 #linux/macos
-pithon3 main.py
+python3 main.py
 ```
 ### How to train the model
-Before using the bot and after every function you might add you need to train the bot. To do so you can use the `train.py` script. The file that will be used for training is the `intents.json` file: it's in Italian so you might need to translate it to your native language. You can either edit that one file or one of the intents .json, which are all kept int `intents_data\` folder. If you edit on the intent .json or add one you will need to recompile the main `intents.json` file with the `compile_dataset.json` script. It will automatically load and compile any .json in the folder so beware.
+Before using the bot and after every function you might add you need to train the bot. To do so you can use the `train.py` script. The file that will be used for training is the `intents.json` file: it's in Italian so you might need to translate it to your native language. You can either edit that one file or one of the intent .json, which are all kept int `intents_data\` folder. If you edit one of the intent .json or add one, you'll need to recompile the main `intents.json` file with the `compile_dataset.json` script. It will automatically load and compile any .json in the `intents_data\` folder so pay attention.
 
 Once done so you can use the `train.py` script and train the bot, it will take around 5 minutes depending on your system power. After that you have to convert it to .tflite with the `convert_to_litert.py` script. You can also use the unconverted .pth model or convert it to .onnx with the `convert_to_onnx.py` script but in those cases you'll need to edit the code in `engine.py` too to make it work.
 
@@ -80,9 +80,9 @@ All the main requirements are listed in the `requirements.txt` and can be instal
 pip install -r requirements.txt
 ```
 Additional requirements are needed to train and convert the model needed by the bot:
-* pytorch (2.12) to train and convert;
-* onnxruntime (and onnxscripts) if you need to convert for ONNX;
-* litert-torch and torchvision (0.27) to convert for LiteRT.
+* *pytorch* (v2.12) to train and convert;
+* *onnxruntime* and *onnxscripts* if you need to convert for ONNX;
+* *litert-torch* and *torchvision* (v0.27) to convert for LiteRT.
 
 You can find the training and conversion scripts in the `/nlp_training` folder.
 Pay attention to compatibility between dependencies as there might be conflicts.
@@ -97,8 +97,8 @@ Pay attention to compatibility between dependencies as there might be conflicts.
 * **Handy Commands:** You can easily show all the memo, clean the memo list, find help and show system status monitor.
 
 ## Tech-Stack
-* **Language:** Python (tested on 3.11-3.12-3.13)
-* **Package Manager:** pip (25.0,1)
+* **Language:** Python (tested on v3.11-3.12-3.13)
+* **Package Manager:** pip (v25.0.1)
 * **Bot Framework:** `pyTelegramBotAPI`
 * **NLP:** `PyTorch` (training) and `LiteRT` (execution)
 * **Database:** SQLite3
