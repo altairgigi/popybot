@@ -4,7 +4,7 @@ import requests
 import telebot
 import speech_recognition
 from dotenv import load_dotenv
-from src import engine, greet, memo, voice, weather
+from src import engine, greet, memo, stats, voice, weather
 import config
 
 load_dotenv()
@@ -75,8 +75,12 @@ def memo_list(message):
     bot.send_message(message.chat.id, memo.read_memos(message.chat.id))
 
 @bot.message_handler(commands = ['clean'])
-def memo_list(message):
+def clean_list(message):
     bot.send_message(message.chat.id, memo.clean_memos(message.chat.id))
+
+@bot.message_handler(commands = ['stats'])
+def show_stats(message):
+    bot.send_message(message.chat.id, stats.get_stats(), parse_mode="HTML")
 
 @bot.message_handler(content_types=['voice'])
 def voice_handler(message):

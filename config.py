@@ -30,11 +30,22 @@ RESPONSES = {
 
 #templates for replies
 TEMPLATES = {
-    "weather_report": "Questo è il tempo a <b>{location}</b>:\n{condition}\n<b>{temperature}°C</b>",
+    "weather_report": "Questo è il tempo a <b>{location}</b>:\n"
+                      "{condition}\n"
+                      "<b>{temperature}°C</b>",
     "forecast_header": "Questo è il tempo a <b>{location}</b> nei prossimi giorni:\n",
-    "forecast_report": "<b>{date}</b>:\n{condition}\nMassima: <b>{temp_max}°C</b>\nMinima: <b>{temp_min}°C</b>\n",
+    "forecast_report": "<b>{date}</b>:\n"
+                       "{condition}\n"
+                       "Massima: <b>{temp_max}°C</b>\n"
+                       "Minima: <b>{temp_min}°C</b>",
     "memo_save": "Fatto! Ho annotato '{title}' alle {time} il {date}.",
-    "memo_alert": "<b>PROMEMORIA!</b>\n\nNon scordarti di <b><i>{memo}</i></b>!"
+    "memo_alert": "<b>PROMEMORIA!</b>\n\n"
+                  "Non scordarti di <b><i>{memo}</i></b>!",
+    "stats_report": "<b>PoPyBot</b> V2.1\nRunning on <i>{os}</i>:\n"
+                    "<b>CPU</b>: {cpu_load}%\t<b>RAM</b>: {ram_load}%\n"
+                    "<b>Up</b>: {upload}Mb\t<b>Down</b>: {download}Mb\n"
+                    "<b>Batt</b>: {battery}%\t<b>Temp</b>: {temperature}C°\n"
+                    "<b>Uptime</b>: {uptime}"
 }
 
 #default greetings
@@ -111,8 +122,8 @@ WEATHER_PATTERN = r"\b(" + "|".join(WEATHER_PREFIX_LIST) + r")\s+([a-z\s]+)"
 DATABASE_NAME = "memo_data.db"
 MODEL_DATA = "src/model.tflite"
 META_DATA = "src/metadata.json"
-DEFAULT_MINUTES = "00"
 DEFAULT_HOUR = "09"
+DEFAULT_MINUTES = "00"
 LANG = "it"
 LANGUAGE = "it_IT"
 WEATHER_SERVICE_URL = "https://api.weatherapi.com/v1/current.json"

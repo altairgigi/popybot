@@ -77,6 +77,7 @@ def extract_entities(message, intent):
     )
 
     memo_date = datetime.now().date().strftime("%d/%m/%Y")
+    memo_time = f"{config.DEFAULT_HOUR}:{config.DEFAULT_MINUTES}"
     memo_hour = config.DEFAULT_HOUR
     memo_minutes = config.DEFAULT_MINUTES
 
@@ -84,20 +85,23 @@ def extract_entities(message, intent):
         text, temporal_data = matches[0]
         
         memo_date = temporal_data.strftime("%d/%m/%Y")
-
-        time_match = re.search(config.TIME_PATTERN, clean_text, re.IGNORECASE)
-
-        if time_match:
-            memo_hour = time_match.group(1).zfill(2)
-            if time_match.group(2):
-                memo_minutes = time_match.group(2)
-            
-            clean_text = re.sub(config.TIME_PATTERN, "", clean_text).strip()
-
+        memo_time = temporal_data.strftime("%H:%M")
+        
         clean_text = re.sub(config.PREFIX_PATTERN + re.escape(text), "", clean_text, flags=re.IGNORECASE)
+
+    time_match = re.search(config.TIME_PATTERN, clean_text, re.IGNORECASE)
+
+    if time_match:
+        memo_hour = time_match.group(1).zfill(2)
+        if time_match.group(2):
+            memo_minutes = time_match.group(2)
+        
+        memo_time = f"{memo_hour}:{memo_minutes}"
+        
+        clean_text = re.sub(config.TIME_PATTERN, "", clean_text).strip()
     
     entities['date'] = memo_date
-    entities['time'] = f"{memo_hour}:{memo_minutes}"
+    entities['time'] = memo_time
 
     if intent == "weather":
         for prefix in config.WEATHER_PREFIX_LIST:
