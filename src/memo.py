@@ -24,7 +24,8 @@ def memo_alert(bot):
             for memo in expired_memos:
                 bot.send_message(memo[1], config.TEMPLATES['memo_alert'].format(memo=memo[2]), parse_mode="HTML")
 
-        time.sleep(60)
+        wait_time = 60 - datetime.now().second
+        time.sleep(wait_time)
 
 def start_memo_alert(bot):
     memo_checking_thread = threading.Thread(target=memo_alert, args=(bot,), daemon=True)

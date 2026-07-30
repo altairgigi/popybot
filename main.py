@@ -1,17 +1,24 @@
 import gc
 import os
 from bot import bot
-from src import database, memo
+from src import database, digest, memo
 
 if __name__ == "__main__":
-    print(f"Bot started. PID: {os.getpid()}")
-    print("Starting database...")
-    database.initialise()
+    print(f"Bot started at PID: {os.getpid()}")
     
-    print("Starting alert system...")
+    print("Starting database...", end="")
+    database.initialise()
+    print(" OK")
+    
+    print("Starting alert system...", end="")
     memo.start_memo_alert(bot)
+    print(" OK")
+
+    print("Starting digest system...", end="")
+    digest.start_daily_digest(bot)
+    print(" OK")
 
     gc.collect()
 
-    print("Bot is listening...")
+    print("Bot is now polling...")
     bot.infinity_polling()

@@ -13,4 +13,4 @@ def greet_user():
     else:
         reply_greet = config.GREETINGS['generic']
 
-    return reply_greet + config.RESPONSES['greeting']
+    return reply_greet

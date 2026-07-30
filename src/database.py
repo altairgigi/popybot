@@ -6,6 +6,7 @@ def initialise():
 
     cursor = connection.cursor()
 
+    #create table for memos
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS memo (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -13,6 +14,15 @@ def initialise():
             title TEXT,
             time TEXT,
             date TEXT
+        )                    
+    """)
+
+    #create table for user settings, mainly for the daily digest
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS user_settings (
+            chat_id INTEGER PRIMARY KEY,
+            digest_time TEXT NOT NULL,
+            location TEXT NOT NULL
         )                    
     """)
 
@@ -48,6 +58,16 @@ def check_memo(time, date):
 
     return expired_memos
 
+def clean_memo_list(chat_id):
+    connection = sqlite3.connect(config.DATABASE_NAME)
+
+    cursor = connection.cursor()
+
+    cursor.execute("DELETE FROM memo WHERE chat_id = ?", (chat_id,))
+
+    connection.commit()
+    connection.close()
+
 def get_memo_list(chat_id):
     connection = sqlite3.connect(config.DATABASE_NAME)
 
@@ -62,12 +82,40 @@ def get_memo_list(chat_id):
 
     return memo_list
 
-def clean_memo_list(chat_id):
+def get_daily_memo_list(chat_id, date):
     connection = sqlite3.connect(config.DATABASE_NAME)
-
+    
     cursor = connection.cursor()
 
-    cursor.execute("DELETE FROM memo WHERE chat_id = ?", (chat_id,))
+    cursor.execute("SELECT title, time FROM memo WHERE chat_id = ? and date = ?", (chat_id, date))
+
+    daiyl_memo_list = cursor.fetchall()
+
+    connection.commit()
+    connection.close()
+
+    return daiyl_memo_list
+
+def get_digest_list(time):
+    connection = sqlite3.connect(config.DATABASE_NAME)
+    
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT chat_id, location FROM user_settings WHERE digest_time = ?", (time,))
+
+    digest_list = cursor.fetchall()
+
+    connection.commit()
+    connection.close()
+
+    return digest_list
+
+def set_user_settings(chat_id, digest_time, location):
+    connection = sqlite3.connect(config.DATABASE_NAME)
+    
+    cursor = connection.cursor()
+
+    cursor.execute("INSERT OR REPLACE INTO user_settings (chat_id, digest_time, location) VALUES (?, ?, ?)", (chat_id, digest_time, location))
 
     connection.commit()
     connection.close()

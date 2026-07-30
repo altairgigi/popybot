@@ -4,7 +4,7 @@ import requests
 import telebot
 import speech_recognition
 from dotenv import load_dotenv
-from src import engine, greet, memo, stats, voice, weather
+from src import engine, digest, greet, memo, stats, voice, weather
 import config
 
 load_dotenv()
@@ -24,7 +24,7 @@ def process_message(message, user_text):
         entities = engine.extract_entities(user_text, user_intent)
 
         if user_intent == config.INTENTS['greet']:
-            bot.send_message(message.chat.id, greet.greet_user())
+            bot.send_message(message.chat.id, greet.greet_user() + config.RESPONSES['greeting'])
 
         elif user_intent == config.INTENTS['memo']:
             title = entities['action']
@@ -80,6 +80,10 @@ def clean_list(message):
 @bot.message_handler(commands = ['stats'])
 def show_stats(message):
     bot.send_message(message.chat.id, stats.get_stats(), parse_mode="HTML")
+
+@bot.message_handler(commands = ['set_digest'])
+def show_stats(message):
+    bot.send_message(message.chat.id, digest.set_digest(message))
 
 @bot.message_handler(content_types=['voice'])
 def voice_handler(message):
