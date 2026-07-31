@@ -1,5 +1,5 @@
 # PoPyBot
-A modular personal assistant written in Python. The bot is optimised to run even on limited hardware (like a Raspberry Pi Zero), is capable of managing memos, telling the weather and alerting when a memo expires, and offers unlimited feature possibilities thanks to its modular design.
+A modular personal assistant written in Python. The bot is optimised to run even on limited hardware (like a Raspberry Pi Zero), is capable of managing memos, telling the weather, find the news and alerting when a memo expires, and offers unlimited feature possibilities thanks to its modular design.
 
 ## Installation
 1) Clone the repository
@@ -80,9 +80,13 @@ All the main requirements are listed in the `requirements.txt` and can be instal
 pip install -r requirements.txt
 ```
 Additional requirements are needed to train and convert the model needed by the bot:
-* *pytorch* (v2.12) to train and convert;
+* *pytorch* (v2.12.1 is preferred) to train and convert;
 * *onnxruntime* and *onnxscripts* if you need to convert for ONNX;
 * *litert-torch* and *torchvision* (v0.27) to convert for LiteRT.
+Usually it's just enough to go with:
+```bash
+pip install litert-torch torchvision ai-edge-litert
+```
 
 You can find the training and conversion scripts in the `/nlp_training` folder.
 Pay attention to compatibility between dependencies as there might be conflicts.
@@ -90,7 +94,9 @@ Pay attention to compatibility between dependencies as there might be conflicts.
 ## Features
 * **Speech-to-Text (STT):** Accepts Telegram voice messages, converts them, and automatically transcribes them to text.
 * **Smart Notifications:** Reminder management system with an asynchronous background alert system.
-* **Live Weather:** Provides current weather conditions and temperatures for any city.
+* **Live Weather:** Provides current or forecast weather conditions and temperatures for any city.
+* **News Feed:** Provides the RSS feed from your favourite news outlet.
+* **Daily digest:** Program when to receive a digest of the weather in your city, your daily tasks and short news feed.
 * **Modular Design:** Modular architecture with complete separation between modules logic, centralized configurations and databases.
 * **NLP Intent Recognition:** Understands what you need thanks to a small-sized model tuned specifically for the bot's functions.
 * **Local Fallback System:** When the bot is not enough it can forward your query to a local model through Ollama (provided you set it up).
@@ -118,6 +124,7 @@ This project was made possible thanks to the following open-source technologies 
 * **[PyTorch](https://pytorch.org/)**
 * **[SpeechRecognition](https://github.com/Uberi/speech_recognition)**
 * **[WeatherAPI](https://www.weatherapi.com/)**
+* **[FeedParser](https://feedparser.readthedocs.io/en/latest/#)**
 
 ## License
 [GPL3.0](https://choosealicense.com/licenses/gpl-3.0/)

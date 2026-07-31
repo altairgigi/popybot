@@ -10,7 +10,7 @@ API_KEY = os.environ.get("WEATHER_API_KEY")
 WEATHER_URL = config.WEATHER_SERVICE_URL
 FORECAST_URL = config.FORECAST_SERVICE_URL
 
-def get_weather(location, when):
+def get_weather(location, when = None):
     today = datetime.now().date().strftime("%d/%m/%Y")
     
     if when == today or when is None:

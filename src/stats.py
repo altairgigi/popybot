@@ -35,12 +35,12 @@ def get_stats():
     uptime = str(uptime_delta).split(".")[0]
 
     return config.TEMPLATES['stats_report'].format(
-            os=os,
-            cpu_load=cpu_load,
-            ram_load=ram_load,
-            upload=upload,
-            download=download,
-            battery=battery,
-            temperature=temperature,
-            uptime=uptime
+            os= os,
+            cpu_load= cpu_load,
+            ram_load= ram_load,
+            upload= upload,
+            download= download,
+            battery= battery,
+            temperature= temperature,
+            uptime= uptime
         )

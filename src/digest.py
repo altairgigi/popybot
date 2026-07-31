@@ -1,7 +1,7 @@
 import time
 import threading
 from datetime import datetime
-from src import database, greet, weather
+from src import database, greet, news, weather
 import config
 
 def set_digest(message):
@@ -33,8 +33,9 @@ def daily_digest(bot):
         if len(digest_list) >= 1:
             for chat_id, location in digest_list:
                 digest_intro = greet.greet_user()
-                digest_weather = weather.get_weather(location, None)
+                digest_weather = weather.get_weather(location)
                 daily_memo_list = database.get_daily_memo_list(chat_id, date_today)
+                digest_news = news.get_news(config.DIGEST_NEWS)
 
                 if len(daily_memo_list) >= 1:
                     digest_memo = config.TEMPLATES['digest_memo_intro']
@@ -45,12 +46,13 @@ def daily_digest(bot):
                     digest_memo = config.TEMPLATES['digest_memo_none']
 
                 digest = config.TEMPLATES['digest_report'].format(
-                    intro=digest_intro,
-                    weather=digest_weather,
-                    memo=digest_memo
+                    intro= digest_intro,
+                    weather= digest_weather,
+                    memo= digest_memo,
+                    news= digest_news
                 )
 
-                bot.send_message(chat_id, digest, parse_mode="HTML")
+                bot.send_message(chat_id, digest, parse_mode="HTML", disable_web_page_preview=True)
                 time.sleep(0.05)
 
 def start_daily_digest(bot):

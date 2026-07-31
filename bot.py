@@ -4,7 +4,7 @@ import requests
 import telebot
 import speech_recognition
 from dotenv import load_dotenv
-from src import engine, digest, greet, memo, stats, voice, weather
+from src import engine, digest, greet, memo, news, stats, voice, weather
 import config
 
 load_dotenv()
@@ -31,6 +31,10 @@ def process_message(message, user_text):
             time = entities['time']
             date = entities['date']
             bot.send_message(message.chat.id, memo.write_memo(message.chat.id, title, time, date))
+
+        elif user_intent == config.INTENTS['news']:
+            location = entities['location']
+            bot.send_message(message.chat.id, news.get_news(config.REPORT_NEWS ,location), parse_mode="HTML", disable_web_page_preview=True)
 
         elif user_intent == config.INTENTS['weather']:
             location = entities['location']
