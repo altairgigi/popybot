@@ -1,4 +1,12 @@
 # PoPyBot
+<!-- Core Stack -->
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)
+![Telegram](https://img.shields.io/badge/Bot-Telebot-26A5E4?logo=telegram&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.12-EE4C2C?logo=pytorch&logoColor=white)
+![LiteRT](https://img.shields.io/badge/LiteRT-2.1.6-FF6F00?logo=tensorflow&logoColor=white)
+![SQLite](https://img.shields.io/badge/Database-SQLite3-003B57?logo=sqlite&logoColor=white)
+![RSS](https://img.shields.io/badge/RSS-Supported-FFA500?logo=rss&logoColor=white)
+
 A modular personal assistant written in Python. The bot is optimised to run even on limited hardware (like a Raspberry Pi Zero), is capable of managing memos, telling the weather, find the news and alerting when a memo expires, and offers unlimited feature possibilities thanks to its modular design.
 
 ## Installation

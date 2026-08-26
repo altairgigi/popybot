@@ -12,9 +12,10 @@ RESPONSES = {
     "start": "PRONTI!",
     "help": "Ciao! Io sono PoPyBot, il tuo assistente virtuale Telegram scritto interamente in Python!\n"
             "Attualmente, posso dirti il meteo (es. 'che tempo fa a Roma?'), darti le ultime notizie (es. 'quali sono le ultime notizie?') e ricordarti le cose (es. 'ricordami di fare la spesa domani alle 11') in maniera completamente autonoma.\n"
-            "Se lo imposti con il comando '/set_digest [data] [luogo]' farò un riepilogo giornaliero all'orario scelto con il meteo del luogo selezionato.\n"
+            "\nSe lo imposti con il comando '/set_digest orario luogo' farò un riepilogo giornaliero all'orario scelto con il meteo del luogo selezionato.\n"
+            "Inoltre, con il comando '/set_routine \"titolo\" orario' puoi impostare promemoria quotidiani.\n"
             "Altri comandi che puoi usare sono '/memo' per vedere i tuoi promemoria e '/clean' per cancellarli tutti.\n"
-            "Inoltre, per richieste più complesse, posso chiedere aiuto al mio cervello di riserva ospitato su Ollama (se configurato).\n"
+            "\nInoltre, per richieste più complesse, posso chiedere aiuto al mio cervello di riserva ospitato su Ollama (se configurato).\n"
             "Dimmi pure cosa ti serve e cercherò di aiutarti come posso!",
     "unknown_replies": [
         "6 7",
@@ -24,6 +25,8 @@ RESPONSES = {
     "greeting": ", come posso aiutarti?",
     "digest_error": "Errore! Assicurati di scrivere 'orario' e 'luogo' dopo il comando e che l'orario sia in formato 'HH:MM'!",
     "digest_set": "Riepilogo impostato!",
+    "routine_error": "Errore! Assicurati di scrivere 'titolo' e 'orario' dopo il comando, che il titolo sia tra doppi apici e che l'orario sia in formato 'HH:MM'!",
+    "routine_set": "Routine impostata!",
     "reply_list": "Ecco i tuoi promemoria:\n",
     "empty_list": "La lista dei promemoria è vuota!",
     "clean_list": "La lista dei promemoria è stata svuotata!",
@@ -52,7 +55,7 @@ TEMPLATES = {
     "digest_report": "{intro}, ecco il tuo riepilogo giornaliero!\n\n{weather}\n\n{memo}\n{news}",
     "news_report": "Ecco le ultime notizie:\n{news}",
     "news_feed": "<b>{title}</b>\n<i>{description}</i>\nPubblicato il {date}\n<a href='{link}'><b>Link</b></a>\n",
-    "stats_report": "<b>PoPyBot</b> V2.3\nRunning on <i>{os}</i>:\n"
+    "stats_report": "<b>PoPyBot</b> V2.4\nRunning on <i>{os}</i>:\n"
                     "<b>CPU</b>: {cpu_load}%\t<b>RAM</b>: {ram_load}%\n"
                     "<b>Up</b>: {upload}Mb\t<b>Down</b>: {download}Mb\n"
                     "<b>Batt</b>: {battery}%\t<b>Temp</b>: {temperature}C°\n"
@@ -103,12 +106,16 @@ MEMO_PREFIX_LIST = [
     "annotami che "
 ]
 
+NEWS_PREFIX_LIST = [ 
+    "a", 
+    "da",
+]
+
 WEATHER_PREFIX_LIST = [
     "di", 
     "a", 
     "per", 
-    "su", 
-    "meteo"
+    "su"
 ]
 
 GENERIC_PREFIX_LIST = [
@@ -129,6 +136,7 @@ ARTICLES = r"\b(un|una|uno)"
 PREPOSITIONS = r"\b(il|tra|fra|per)"
 PREFIX_PATTERN = r"(?:\b(?:" + "|".join(GENERIC_PREFIX_LIST) + r")\b\s*)*"
 MEMO_PATTERN = r".*?\b(?:" + "|".join(MEMO_PREFIX_LIST) + r"\b)"
+NEWS_PATTERN = r"\b(" + "|".join(NEWS_PREFIX_LIST) + r")\s+([a-z\s]+)"
 TIME_PATTERN = PREFIX_PATTERN + r"(?:a|alle|le)?\s(\d{1,2})(?::(\d{2}))?"
 WEATHER_PATTERN = r"\b(" + "|".join(WEATHER_PREFIX_LIST) + r")\s+([a-z\s]+)"
 

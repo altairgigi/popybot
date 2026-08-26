@@ -17,6 +17,16 @@ def initialise():
         )                    
     """)
 
+    #create table for routines
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS routines (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            chat_id INTEGER,
+            title TEXT,
+            time TEXT
+        )
+    """)
+
     #create table for user settings, mainly for the daily digest
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS user_settings (
@@ -109,6 +119,40 @@ def get_digest_list(time):
     connection.close()
 
     return digest_list
+
+def add_routine(chat_id, title, time):
+    connection = sqlite3.connect(config.DATABASE_NAME)
+
+    cursor = connection.cursor()
+
+    cursor.execute("INSERT INTO routines (chat_id, title, time) VALUES (?, ?, ?)", (chat_id, title, time))
+
+    connection.commit()
+    connection.close()
+
+def clean_routines(chat_id):
+    connection = sqlite3.connect(config.DATABASE_NAME)
+
+    cursor = connection.cursor()
+
+    cursor.execute("DELETE FROM routines WHERE chat_id = ?", (chat_id,))
+
+    connection.commit()
+    connection.close()
+
+def get_routines(time):
+    connection = sqlite3.connect(config.DATABASE_NAME)
+
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT chat_id, title FROM routines WHERE time = ?", (time,))
+
+    routines = cursor.fetchall()
+
+    connection.commit()
+    connection.close()
+
+    return routines
 
 def set_user_settings(chat_id, digest_time, location):
     connection = sqlite3.connect(config.DATABASE_NAME)

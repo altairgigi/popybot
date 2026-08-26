@@ -1,7 +1,7 @@
 import gc
 import os
 from bot import bot
-from src import database, digest, memo
+from src import database, digest, memo, routine
 
 if __name__ == "__main__":
     print(f"Bot started at PID: {os.getpid()}")
@@ -10,8 +10,12 @@ if __name__ == "__main__":
     database.initialise()
     print(" OK")
     
-    print("Starting alert system...", end="")
+    print("Starting memo alert system...", end="")
     memo.start_memo_alert(bot)
+    print(" OK")
+
+    print("Starting routine system...", end="")
+    routine.start_routine(bot)
     print(" OK")
 
     print("Starting digest system...", end="")

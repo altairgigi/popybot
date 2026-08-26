@@ -13,13 +13,20 @@ def get_news(number, location = None):
     if location is not None:
         filtered_feed = []
 
-        for entry in feed:
+        for entry in feed.entries:
             if location.lower() in entry.title.lower() or location.lower() in entry.description.lower():
                 filtered_feed.append(entry)
 
-        feed = filtered_feed
+        if len(filtered_feed) == 0:
+            return config.RESPONSES['news_error']
 
-    x = range(number)
+        feed.entries = filtered_feed
+
+    if len(feed.entries) < number:
+        x = range(len(feed.entries))
+    else:
+        x = range(number)
+
     for n in x:
         date_raw = datetime.strptime(feed.entries[n].published, "%a, %d %b %Y %H:%M:%S %z")
         date_final = datetime.strftime(date_raw, "%d %B %Y - %H:%M")

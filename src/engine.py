@@ -103,16 +103,23 @@ def extract_entities(message, intent):
     entities['date'] = memo_date
     entities['time'] = memo_time
 
-    if intent == "weather":
-        for prefix in config.WEATHER_PREFIX_LIST:
-            if clean_text.lower().startswith(prefix):
-                clean_text = clean_text[len(prefix):].strip()
-        
-        city_match = re.search(config.WEATHER_PATTERN, clean_text, re.IGNORECASE)
+    if intent == "weather" or intent == "news":
+        if intent == "wheater":
+            for prefix in config.WEATHER_PREFIX_LIST:
+                if clean_text.lower().startswith(prefix):
+                    clean_text = clean_text[len(prefix):].strip()
+
+            city_match = re.search(config.WEATHER_PATTERN, clean_text, re.IGNORECASE)
+        else:
+            for prefix in config.NEWS_PREFIX_LIST:
+                if clean_text.lower().startswith(prefix):
+                    clean_text = clean_text[len(prefix):].strip()
+
+            city_match = re.search(config.NEWS_PATTERN, clean_text, re.IGNORECASE)
 
         if city_match:
             entities['location'] = city_match.group(2).strip()
-        else:
+        elif intent == "weather":
             entities['location'] = clean_text
 
     if intent == 'memo':
