@@ -12,8 +12,8 @@ RESPONSES = {
     "start": "PRONTI!",
     "help": "Ciao! Io sono PoPyBot, il tuo assistente virtuale Telegram scritto interamente in Python!\n"
             "Attualmente, posso dirti il meteo (es. 'che tempo fa a Roma?'), darti le ultime notizie (es. 'quali sono le ultime notizie?') e ricordarti le cose (es. 'ricordami di fare la spesa domani alle 11') in maniera completamente autonoma.\n"
-            "\nSe lo imposti con il comando '/set_digest orario luogo' farò un riepilogo giornaliero all'orario scelto con il meteo del luogo selezionato.\n"
-            "Inoltre, con il comando '/set_routine \"titolo\" orario' puoi impostare promemoria quotidiani.\n"
+            "\nSe lo imposti con il comando '/set_digest orario luogo', farò un riepilogo giornaliero all'orario scelto con il meteo del luogo selezionato.\n"
+            "Inoltre, con il comando '/set_routine \"titolo\" orario', puoi impostare promemoria quotidiani.\n"
             "Altri comandi che puoi usare sono '/memo' per vedere i tuoi promemoria e '/clean' per cancellarli tutti.\n"
             "\nInoltre, per richieste più complesse, posso chiedere aiuto al mio cervello di riserva ospitato su Ollama (se configurato).\n"
             "Dimmi pure cosa ti serve e cercherò di aiutarti come posso!",
@@ -55,10 +55,10 @@ TEMPLATES = {
     "digest_report": "{intro}, ecco il tuo riepilogo giornaliero!\n\n{weather}\n\n{memo}\n{news}",
     "news_report": "Ecco le ultime notizie:\n{news}",
     "news_feed": "<b>{title}</b>\n<i>{description}</i>\nPubblicato il {date}\n<a href='{link}'><b>Link</b></a>\n",
-    "stats_report": "<b>PoPyBot</b> V2.4\nRunning on <i>{os}</i>:\n"
+    "stats_report": "<b>PoPyBot</b> V2.4.1\nRunning on <i>{os}</i>:\n"
                     "<b>CPU</b>: {cpu_load}%\t<b>RAM</b>: {ram_load}%\n"
                     "<b>Up</b>: {upload}Mb\t<b>Down</b>: {download}Mb\n"
-                    "<b>Batt</b>: {battery}%\t<b>Temp</b>: {temperature}C°\n"
+                    "<b>Batt</b>: {battery}\t<b>Temp</b>: {temperature}\n"
                     "<b>Uptime</b>: {uptime}"
 }
 

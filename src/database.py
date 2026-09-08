@@ -83,7 +83,7 @@ def get_memo_list(chat_id):
 
     cursor = connection.cursor()
 
-    cursor.execute("SELECT title, time, date FROM memo WHERE chat_id = ?", (chat_id,))
+    cursor.execute("SELECT title, time, date FROM memo WHERE chat_id = ? ORDER BY date, time", (chat_id,))
 
     memo_list = cursor.fetchall()
 
@@ -97,14 +97,26 @@ def get_daily_memo_list(chat_id, date):
     
     cursor = connection.cursor()
 
-    cursor.execute("SELECT title, time FROM memo WHERE chat_id = ? and date = ?", (chat_id, date))
+    cursor.execute("SELECT title, time FROM memo WHERE chat_id = ? and date = ? "
+                   "UNION ALL "
+                   "SELECT title, time FROM routines WHERE chat_id = ? "     
+                   "ORDER BY time", (chat_id, date, chat_id,))
 
-    daiyl_memo_list = cursor.fetchall()
+    daily_memo_list = cursor.fetchall()
+
+    #cursor.execute("SELECT title, time FROM routines WHERE chat_id = ? ORDER BY time", (chat_id,))
+
+    #routine_list = cursor.fetchall()
+
+    #daily_memo_list = {
+    #    "memo": memo_list,
+    #    "routine": routine_list
+    #}
 
     connection.commit()
     connection.close()
 
-    return daiyl_memo_list
+    return daily_memo_list
 
 def get_digest_list(time):
     connection = sqlite3.connect(config.DATABASE_NAME)

@@ -23,11 +23,11 @@ def get_stats():
     download = round(psutil.net_io_counters().bytes_recv / (1024 * 1024), 2)
     
     battery_info = psutil.sensors_battery()
-    battery = battery_info.percent if battery_info else "N/A"
+    battery = f"{battery_info.percent}%" if battery_info else "N/A"
 
     try:
         temps = psutil.sensors_temperatures()
-        temperature = round(next(iter(temps.values()))[0].current, 1)
+        temperature = f" {round(next(iter(temps.values()))[0].current, 1)}C°"
     except (AttributeError, KeyError, IndexError, StopIteration):
         temperature = "N/A"
 

@@ -104,7 +104,7 @@ Pay attention to compatibility between dependencies as there might be conflicts.
 * **Smart Notifications:** Reminder management system with an asynchronous background alert system.
 * **Live Weather:** Provides current or forecast weather conditions and temperatures for any city.
 * **News Feed:** Provides the RSS feed from your favourite news outlet.
-* **Daily digest:** Program when to receive a digest of the weather in your city, your daily tasks and short news feed.
+* **Daily Digest:** Program when to receive a digest of the weather in your city, your daily tasks and short news feed.
 * **Modular Design:** Modular architecture with complete separation between modules logic, centralized configurations and databases.
 * **NLP Intent Recognition:** Understands what you need thanks to a small-sized model tuned specifically for the bot's functions.
 * **Local Fallback System:** When the bot is not enough it can forward your query to a local model through Ollama (provided you set it up).
