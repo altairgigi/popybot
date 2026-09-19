@@ -14,9 +14,21 @@ RESPONSES = {
             "Attualmente, posso dirti il meteo (es. 'che tempo fa a Roma?'), darti le ultime notizie (es. 'quali sono le ultime notizie?') e ricordarti le cose (es. 'ricordami di fare la spesa domani alle 11') in maniera completamente autonoma.\n"
             "\nSe lo imposti con il comando '/set_digest orario luogo', farò un riepilogo giornaliero all'orario scelto con il meteo del luogo selezionato.\n"
             "Inoltre, con il comando '/set_routine \"titolo\" orario', puoi impostare promemoria quotidiani.\n"
-            "Altri comandi che puoi usare sono '/memo' per vedere i tuoi promemoria e '/clean' per cancellarli tutti.\n"
-            "\nInoltre, per richieste più complesse, posso chiedere aiuto al mio cervello di riserva ospitato su Ollama (se configurato).\n"
-            "Dimmi pure cosa ti serve e cercherò di aiutarti come posso!",
+            "\nInfine, per richieste più complesse, posso chiedere aiuto al mio cervello di riserva ospitato su Ollama (se configurato).\n"
+            "Dimmi pure cosa ti serve e cercherò di aiutarti come posso!\n"
+            "\nQui di seguito una lista di tutti i comandi disponibili:\n"
+            "\n/start"
+            "\n/help"
+            "\n/status"
+            "\n/memos"
+            "\n/clean_memos"
+            "\n/delete_memo [numero]"
+            "\n/routines"
+            "\n/clean_routines"
+            "\n/delete_routine [numero]"
+            "\n/set_digest [orario] [luogo]"
+            "\n/set_routine [\"titolo\"] [orario]"
+            "\n\nSe vuoi sapere di più su un comando scrivi /help ['comando']",
     "unknown_replies": [
         "6 7",
         "C'hai detto?",
@@ -27,9 +39,14 @@ RESPONSES = {
     "digest_set": "Riepilogo impostato!",
     "routine_error": "Errore! Assicurati di scrivere 'titolo' e 'orario' dopo il comando, che il titolo sia tra doppi apici e che l'orario sia in formato 'HH:MM'!",
     "routine_set": "Routine impostata!",
-    "reply_list": "Ecco i tuoi promemoria:\n",
-    "empty_list": "La lista dei promemoria è vuota!",
-    "clean_list": "La lista dei promemoria è stata svuotata!",
+    "reply_memos": "Ecco i tuoi promemoria:\n",
+    "reply_routines": "Ecco le tue routine:\n",
+    "empty_memos": "La lista dei promemoria è vuota!",
+    "empty_routines": "La lista delle routine è vuota!",
+    "clean_memos": "La lista dei promemoria è stata svuotata!",
+    "clean_routines": "La lista delle routine è stata svuotata!",
+    "delete_memo": "Il promemoria è stato eliminato!",
+    "delete_routine": "La routine è stata eliminata!",
     "missing_memo": "Non mi ha detto cosa devo ricordarti.",
     "missing_city": "Non sono riuscito a controllare il meteo! Controlla di aver scritto bene il nome della città.",
     "news_error": "Non sono riuscito a trovare notizie!", 
@@ -55,11 +72,26 @@ TEMPLATES = {
     "digest_report": "{intro}, ecco il tuo riepilogo giornaliero!\n\n{weather}\n\n{memo}\n{news}",
     "news_report": "Ecco le ultime notizie:\n{news}",
     "news_feed": "<b>{title}</b>\n<i>{description}</i>\nPubblicato il {date}\n<a href='{link}'><b>Link</b></a>\n",
-    "stats_report": "<b>PoPyBot</b> V2.4.1\nRunning on <i>{os}</i>:\n"
+    "status_report": "<b>PoPyBot</b> V2.5\nRunning on <i>{os}</i>:\n"
                     "<b>CPU</b>: {cpu_load}%\t<b>RAM</b>: {ram_load}%\n"
                     "<b>Up</b>: {upload}Mb\t<b>Down</b>: {download}Mb\n"
                     "<b>Batt</b>: {battery}\t<b>Temp</b>: {temperature}\n"
                     "<b>Uptime</b>: {uptime}"
+}
+
+#help messages
+HELP = {
+    "'start'": "/start\nAvvia il bot",
+    "'help'": "/help\nMostra il messaggio di presentazione e aiuto",
+    "'status'": "/status\nMostra informazioni sul dispositivo come sistema operativo, temperatura, uptime, etc",
+    "'memos'": "/memos\nMostra la lista dei promemoria ordinati per data e ora",
+    "'clean_memos'": "/clean_memos\nSvuota la lista dei promemoria",
+    "'delete_memo'": "/delete_memo [numero]\nCancella il promemoria [numero] in base alla posizione nella lista",
+    "'routines'": "/routines\nMostra la lista delle routine ordinate per ora",
+    "'clean_routines'": "/clean_routines\nSvuota la lista delle routine",
+    "'delete_routine'": "/delete_routine [numero]\nCancella la routine [numero] in base alla posizione nella lista",
+    "'set_digest'": "/set_digest [orario] [luogo]\nImposta il riepilogo giornaliero all'[orario] specificato con il meteo del [luogo] scelto",
+    "'set_routine'": "/set_routine [\"titolo\"] [orario]\nImposta una routine all'[orario] specificato. Il titolo va tra \"\"",
 }
 
 #default greetings
@@ -76,7 +108,7 @@ AUDIO_PATH = {
     "wav_path": "audio/voice.wav"
 }
 
-#idiomatic translation for spacy
+#idiomatic translation
 TRANSLATIONS = {
     "it": {
         "idiomatic_times": {

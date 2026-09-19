@@ -43,3 +43,32 @@ def check_routine(bot):
 def start_routine(bot):
     digest_checking_thread = threading.Thread(target=check_routine, args=(bot,), daemon=True)
     digest_checking_thread.start()
+
+def read_routines(chat_id):
+    routines = database.get_routine_list(chat_id)
+
+    routine_reply = config.RESPONSES['empty_routines']
+
+    if routines:
+        routine_reply = config.RESPONSES['reply_routines']
+        
+        for routine in routines:
+            routine_reply += f"* {routine[0]} - {routine[1]}\n"
+
+    return routine_reply
+
+def clean_routines(chat_id):
+    database.clean_routines(chat_id)
+
+    return config.RESPONSES['clean_routines']
+
+def delete_routine(message):
+    chat_id = message.chat.id
+    args = message.text.split()
+
+    if len(args) > 1:
+        number = int(args[1])
+
+    database.delete_routine(chat_id, number)
+
+    return config.RESPONSES['delete_routine']

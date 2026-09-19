@@ -4,7 +4,7 @@ import requests
 import telebot
 import speech_recognition
 from dotenv import load_dotenv
-from src import engine, digest, greet, memo, news, routine, stats, voice, weather
+from src import engine, digest, greet, memo, news, routine, status, voice, weather
 import config
 
 load_dotenv()
@@ -71,19 +71,44 @@ def welcome(message):
 
 @bot.message_handler(commands = ['help'])
 def help(message):
-    bot.send_message(message.chat.id, config.RESPONSES['help'])
+    args = message.text.split()
+    if len(args) == 1: 
+        bot.send_message(message.chat.id, config.RESPONSES['help'])
+    elif len(args) == 2:
+        try:
+            help_response = config.HELP[args[1]]
+        except KeyError:
+            print("Error: this command doesn't exist!")
+        else:
+            bot.send_message(message.chat.id, help_response)
 
-@bot.message_handler(commands = ['memo'])
-def memo_list(message):
+@bot.message_handler(commands = ['memos'])
+def list_memos(message):
     bot.send_message(message.chat.id, memo.read_memos(message.chat.id))
 
-@bot.message_handler(commands = ['clean'])
-def clean_list(message):
+@bot.message_handler(commands = ['clean_memos'])
+def clean_memos(message):
     bot.send_message(message.chat.id, memo.clean_memos(message.chat.id))
 
-@bot.message_handler(commands = ['stats'])
-def show_stats(message):
-    bot.send_message(message.chat.id, stats.get_stats(), parse_mode="HTML")
+@bot.message_handler(commands = ['delete_memo'])
+def delete_memo(message):
+    bot.send_message(message.chat.id, memo.delete_memo(message))
+
+@bot.message_handler(commands = ['routines'])
+def list_routines(message):
+    bot.send_message(message.chat.id, routine.read_routines(message.chat.id))
+
+@bot.message_handler(commands = ['clean_routines'])
+def clean_routines(message):
+    bot.send_message(message.chat.id, routine.clean_routines(message.chat.id))
+
+@bot.message_handler(commands = ['delete_routine'])
+def delete_routine(message):
+    bot.send_message(message.chat.id, routine.delete_routine(message))
+
+@bot.message_handler(commands = ['status'])
+def show_status(message):
+    bot.send_message(message.chat.id, status.get_status(), parse_mode="HTML")
 
 @bot.message_handler(commands = ['set_digest'])
 def show_stats(message):
@@ -103,7 +128,6 @@ def voice_handler(message):
 
     try:
         transcribed_text = voice.transcribe_audio(config.AUDIO_PATH['ogg_path'])
-
         user_text = transcribed_text.lower()    
 
         process_message(message, user_text)

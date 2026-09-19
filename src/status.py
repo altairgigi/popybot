@@ -4,7 +4,7 @@ import distro
 import psutil
 import config
 
-def get_stats():
+def get_status():
     sys_name=platform.system()
 
     if sys_name == "Windows":
@@ -34,7 +34,7 @@ def get_stats():
     uptime_delta = datetime.now() - datetime.fromtimestamp(psutil.boot_time())
     uptime = str(uptime_delta).split(".")[0]
 
-    return config.TEMPLATES['stats_report'].format(
+    return config.TEMPLATES['status_report'].format(
             os= os,
             cpu_load= cpu_load,
             ram_load= ram_load,

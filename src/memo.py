@@ -34,10 +34,10 @@ def start_memo_alert(bot):
 def read_memos(chat_id):
     memos = database.get_memo_list(chat_id)
 
-    memo_reply = config.RESPONSES['empty_list']
+    memo_reply = config.RESPONSES['empty_memos']
 
     if memos:
-        memo_reply = config.RESPONSES['reply_list']
+        memo_reply = config.RESPONSES['reply_memos']
         
         for memo in memos:
             memo_reply += f"* {memo[0]} - {memo[1]} {memo[2]}\n"
@@ -47,4 +47,15 @@ def read_memos(chat_id):
 def clean_memos(chat_id):
     database.clean_memo_list(chat_id)
 
-    return config.RESPONSES['clean_list']
+    return config.RESPONSES['clean_memos']
+
+def delete_memo(message):
+    chat_id = message.chat.id
+    args = message.text.split()
+
+    if len(args) > 1:
+        number = int(args[1])
+
+    database.delete_memo(chat_id, number)
+
+    return config.RESPONSES['delete_memo']
